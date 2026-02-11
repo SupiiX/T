@@ -7,6 +7,7 @@ import { TimelineView } from './timeline-view.js';
 import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
 import { SearchManager } from './search.js';
+import { DatePickerManager } from './datepicker.js';
 
 // Debounce utility function
 function debounce(func, wait) {
@@ -30,6 +31,7 @@ class TimelineApp {
         this.fileHandler = new FileHandler(this.state);
         this.eventManager = new EventManager(this.state);
         this.searchManager = new SearchManager(this.state);
+        this.datePickerManager = new DatePickerManager();
 
         this.init();
     }
@@ -81,6 +83,9 @@ class TimelineApp {
             this.bindFormInputs();
             this.bindCategoryButtons();
 
+            // Initialize beautiful date pickers
+            this.datePickerManager.init();
+
             // CRITICAL: Refresh timeline to update selection highlighting
             // When user clicks an event, form updates but timeline needs re-render
             // to show the 'active' class on the selected event
@@ -103,6 +108,7 @@ class TimelineApp {
         this.bindFormInputs();
         this.bindCategoryButtons();
         this.bindSearch();
+        this.datePickerManager.init();
     }
 
     rebindEvents() {
@@ -112,6 +118,7 @@ class TimelineApp {
         this.bindFormInputs();
         this.bindCategoryButtons();
         this.bindSearch();
+        this.datePickerManager.init();
     }
 
     bindUploadDownload() {
