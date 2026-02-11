@@ -50,7 +50,7 @@ export class UIManager {
       <header class="app-header">
         <div class="header-left">
           <div class="header-logo">${Icons.CalendarDays}</div>
-          <h1>Egyetemi Naptár Kezelő</h1>
+          <h1>Timeline Weblapra</h1>
           <span id="semester-name" class="semester-name">
             ${this.state.data.semester ? `— ${this.escapeHtml(this.state.data.semester.name)}` : ''}
           </span>
@@ -196,7 +196,7 @@ export class UIManager {
 
         return `
       <details class="bilingual-fields">
-        <summary>Angol mezők (English)</summary>
+        <summary>Angol verzio</summary>
         <div class="bilingual-content">
           <div class="form-field">
             <label>Title (EN)</label>
