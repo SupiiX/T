@@ -65,6 +65,14 @@ class TimelineApp {
             this.bindFormActions();
             this.bindFormInputs();
             this.bindCategoryButtons();
+
+            // CRITICAL: Refresh timeline to update selection highlighting
+            // When user clicks an event, form updates but timeline needs re-render
+            // to show the 'active' class on the selected event
+            if (data.currentView === 'timeline') {
+                console.log('Refreshing timeline view to update event selection');
+                this.timelineView.render();
+            }
         }
     }
 
