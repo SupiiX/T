@@ -1,0 +1,51 @@
+/* Header component styles */
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-lg);
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid var(--color-gray-200);
+    flex-shrink: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header-logo svg {
+    width: 28px;
+    height: 28px;
+    color: var(--color-primary);
+}
+
+.app-header h1 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+.semester-name {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    font-weight: 400;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.file-name {
+    font-size: 0.75rem;
+    color: var(--color-gray-500);
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

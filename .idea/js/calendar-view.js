@@ -1,0 +1,113 @@
+// Calendar view using FullCalendar
+
+import { inclusiveToExclusive, exclusiveToInclusive, formatDate } from './utils.js';
+
+export class CalendarView {
+    constructor(state) {
+        this.state = state;
+        this.calendar = null;
+    }
+
+    render() {
+        const calendarEl = document.getElementById('calendar-container');
+        if (!calendarEl) return;
+
+        if (!this.calendar) {
+            // Initialize FullCalendar
+            this.calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['dayGrid', 'interaction'],
+                initialView: 'dayGridMonth',
+                locale: 'hu',
+                editable: true,
+                selectable: true,
+                height: '100%',
+                dayMaxEvents: 3,
+                eventDisplay: 'block',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: ''
+                },
+                events: this.getCalendarEvents(),
+                eventClick: this.handleEventClick.bind(this),
+                dateClick: this.handleDateClick.bind(this),
+                eventDrop: this.handleEventDrop.bind(this)
+            });
+
+            this.calendar.render();
+        } else {
+            // Update events
+            this.calendar.removeAllEvents();
+            this.calendar.addEventSource(this.getCalendarEvents());
+        }
+    }
+
+    getCalendarEvents() {
+        const categoryMap = this.state.getCategoryMap();
+        return this.state.data.events.map(ev => {
+            const cat = categoryMap[ev.category];
+            return {
+                id: String(ev.id),
+                title: ev.title,
+                start: ev.date,
+                end: ev.endDate ? inclusiveToExclusive(ev.endDate) : undefined,
+                backgroundColor: cat?.color || '#6366f1',
+                borderColor: cat?.color || '#6366f1',
+                textColor: '#ffffff',
+                extendedProps: {
+                    category: ev.category,
+                    description: ev.description,
+                    location: ev.location
+                }
+            };
+        });
+    }
+
+    handleEventClick(info) {
+        const ev = info.event;
+        const original = this.state.data.events.find(e => e.id === Number(ev.id));
+
+        if (original) {
+            this.state.data.form = {
+                id: original.id,
+                title: original.title,
+                titleEn: original.titleEn || '',
+                date: formatDate(ev.startStr),
+                endDate: ev.endStr ? exclusiveToInclusive(ev.endStr) : '',
+                category: original.category || '',
+                description: original.description || '',
+                descriptionEn: original.descriptionEn || '',
+                location: original.location || '',
+                locationEn: original.locationEn || '',
+                link: original.link || ''
+            };
+            this.state.notify('form');
+        }
+    }
+
+    handleDateClick(info) {
+        this.state.data.form = {
+            ...this.state.getEmptyForm(),
+            date: info.dateStr
+        };
+        this.state.notify('form');
+    }
+
+    handleEventDrop(info) {
+        const ev = info.event;
+        const newDate = formatDate(ev.startStr);
+        const newEndDate = ev.endStr ? exclusiveToInclusive(ev.endStr) : null;
+
+        this.state.updateEvent(Number(ev.id), {
+            date: newDate,
+            endDate: newEndDate
+        });
+    }
+
+    destroy() {
+        if (this.calendar) {
+            this.calendar.destroy();
+            this.calendar = null;
+        }
+    }
+}
