@@ -23,6 +23,21 @@ class TimelineApp {
         this.ui.renderApp();
         this.bindEvents();
         this.state.subscribe(this.handleStateChange.bind(this));
+        this.loadDefaultData();
+    }
+
+    async loadDefaultData() {
+        try {
+            const response = await fetch('data.json');
+            if (response.ok) {
+                const data = await response.json();
+                this.state.loadData(data);
+                this.state.update('fileName', 'data.json');
+            }
+        } catch (error) {
+            console.warn('Could not load default data.json:', error);
+            // App will work without default data, user can upload their own
+        }
     }
 
     handleStateChange(key, data) {
