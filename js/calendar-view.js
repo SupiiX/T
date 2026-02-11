@@ -15,7 +15,6 @@ export class CalendarView {
         if (!this.calendar) {
             // Initialize FullCalendar
             this.calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: ['dayGrid', 'interaction'],
                 initialView: 'dayGridMonth',
                 locale: 'hu',
                 editable: true,

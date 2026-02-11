@@ -1,9 +1,7 @@
 /* Timeline view styles */
 
 #timeline-container {
-    height: 100%;
     padding: var(--spacing-lg);
-    overflow-y: auto;
 }
 
 .timeline {
