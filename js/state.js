@@ -30,10 +30,12 @@ export class AppState {
         this.notify(key);
     }
 
-    // Update a single form field
+    // Update a single form field (silent update, no re-render)
+    // This allows typing in input fields without losing focus
     updateFormField(field, value) {
         this.data.form[field] = value;
-        this.notify('form');
+        // Note: No notify() call here - prevents re-rendering on every keystroke
+        // UI will only update when explicitly needed (event selection, clear, etc.)
     }
 
     // Get empty form template
@@ -93,6 +95,13 @@ export class AppState {
             map[c.id] = c;
         });
         return map;
+    }
+
+    // Load form data (e.g., when selecting an event)
+    // This DOES trigger UI update
+    loadForm(formData) {
+        this.data.form = formData;
+        this.notify('form');
     }
 
     // Reset form to empty state

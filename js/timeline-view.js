@@ -91,7 +91,7 @@ export class TimelineView {
     }
 
     handleEventClick(ev) {
-        this.state.data.form = {
+        this.state.loadForm({
             id: ev.id,
             title: ev.title,
             titleEn: ev.titleEn || '',
@@ -103,8 +103,7 @@ export class TimelineView {
             location: ev.location || '',
             locationEn: ev.locationEn || '',
             link: ev.link || ''
-        };
-        this.state.notify('form');
+        });
     }
 
     renderEmptyState() {

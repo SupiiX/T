@@ -78,7 +78,7 @@ export class CalendarView {
         const original = this.state.data.events.find(e => e.id === Number(ev.id));
 
         if (original) {
-            this.state.data.form = {
+            this.state.loadForm({
                 id: original.id,
                 title: original.title,
                 titleEn: original.titleEn || '',
@@ -90,17 +90,15 @@ export class CalendarView {
                 location: original.location || '',
                 locationEn: original.locationEn || '',
                 link: original.link || ''
-            };
-            this.state.notify('form');
+            });
         }
     }
 
     handleDateClick(info) {
-        this.state.data.form = {
+        this.state.loadForm({
             ...this.state.getEmptyForm(),
             date: info.dateStr
-        };
-        this.state.notify('form');
+        });
     }
 
     handleEventDrop(info) {
