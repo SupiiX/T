@@ -12,33 +12,35 @@ export class CalendarView {
         const calendarEl = document.getElementById('calendar-container');
         if (!calendarEl) return;
 
-        if (!this.calendar) {
-            // Initialize FullCalendar
-            this.calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'hu',
-                editable: true,
-                selectable: true,
-                height: '100%',
-                dayMaxEvents: 3,
-                eventDisplay: 'block',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: ''
-                },
-                events: this.getCalendarEvents(),
-                eventClick: this.handleEventClick.bind(this),
-                dateClick: this.handleDateClick.bind(this),
-                eventDrop: this.handleEventDrop.bind(this)
-            });
-
-            this.calendar.render();
-        } else {
-            // Update events
-            this.calendar.removeAllEvents();
-            this.calendar.addEventSource(this.getCalendarEvents());
+        // Always destroy existing calendar before creating new one
+        // This ensures handlers are bound to current DOM after view switching
+        if (this.calendar) {
+            this.calendar.destroy();
+            this.calendar = null;
         }
+
+        // Create fresh calendar instance
+        this.calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [ FullCalendar.DayGridPlugin, FullCalendar.Interaction ],
+            initialView: 'dayGridMonth',
+            locale: 'hu',
+            editable: true,
+            selectable: true,
+            height: '100%',
+            dayMaxEvents: 3,
+            eventDisplay: 'block',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            events: this.getCalendarEvents(),
+            eventClick: this.handleEventClick.bind(this),
+            dateClick: this.handleDateClick.bind(this),
+            eventDrop: this.handleEventDrop.bind(this)
+        });
+
+        this.calendar.render();
     }
 
     getCalendarEvents() {

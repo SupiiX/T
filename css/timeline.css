@@ -2,12 +2,15 @@
 
 #timeline-container {
     padding: var(--spacing-lg);
+    height: 100%;
+    overflow: auto;
 }
 
 .timeline {
     position: relative;
     max-width: 800px;
     margin: 0 auto;
+    min-height: 100%;
 }
 
 .timeline-line {
