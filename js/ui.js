@@ -21,7 +21,10 @@ export class UIManager {
                 this.renderSidebar();
                 break;
             case 'data-loaded':
-                this.renderApp();
+                // Update only necessary parts, don't re-render entire app
+                this.updateHeader();
+                this.updateMainPanel();
+                this.renderSidebar();
                 break;
             case 'fileName':
                 this.updateFileName();
@@ -270,6 +273,27 @@ export class UIManager {
         const btn = document.getElementById('download-btn');
         if (btn) {
             btn.disabled = this.state.data.events.length === 0;
+        }
+    }
+
+    updateHeader() {
+        const semesterName = document.getElementById('semester-name');
+        if (semesterName) {
+            semesterName.textContent = this.state.data.semester ? `— ${this.state.data.semester.name}` : '';
+        }
+        this.updateFileName();
+        this.updateDownloadButton();
+    }
+
+    updateMainPanel() {
+        const mainPanel = document.querySelector('.main-panel');
+        if (mainPanel) {
+            const hasEvents = this.state.data.events.length > 0;
+            if (hasEvents) {
+                mainPanel.innerHTML = this.renderContent();
+            } else {
+                mainPanel.innerHTML = this.renderEmptyState();
+            }
         }
     }
 

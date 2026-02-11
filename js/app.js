@@ -48,47 +48,59 @@ class TimelineApp {
     }
 
     handleStateChange(key, data) {
-        if (key === 'data-loaded' || key === 'events') {
+        console.log('App handleStateChange:', key, data);
+        if (key === 'data-loaded') {
+            console.log('Data loaded, re-binding events and switching to view:', data.currentView);
+            // Re-bind events after data loads and UI updates
             this.rebindEvents();
             this.switchView(data.currentView);
+            console.log('Events re-bound successfully');
+        } else if (key === 'events') {
+            // Just refresh the current view when events change
+            console.log('Events changed, refreshing view:', data.currentView);
+            this.switchView(data.currentView);
+        } else if (key === 'form') {
+            // Re-bind form events after sidebar is re-rendered
+            console.log('Form updated, re-binding form events');
+            this.bindFormActions();
+            this.bindFormInputs();
+            this.bindCategoryButtons();
         }
     }
 
     bindEvents() {
-        // Upload/download
+        this.bindUploadDownload();
+        this.bindFormActions();
+        this.bindViewSwitcher();
+        this.bindFormInputs();
+        this.bindCategoryButtons();
+    }
+
+    rebindEvents() {
+        this.bindUploadDownload();
+        this.bindFormActions();
+        this.bindViewSwitcher();
+        this.bindFormInputs();
+        this.bindCategoryButtons();
+    }
+
+    bindUploadDownload() {
         const uploadBtn = document.getElementById('upload-btn');
         const downloadBtn = document.getElementById('download-btn');
 
         if (uploadBtn) {
-            uploadBtn.addEventListener('click', () => {
+            uploadBtn.replaceWith(uploadBtn.cloneNode(true));
+            document.getElementById('upload-btn').addEventListener('click', () => {
                 this.fileHandler.triggerUpload();
             });
         }
 
         if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => {
+            downloadBtn.replaceWith(downloadBtn.cloneNode(true));
+            document.getElementById('download-btn').addEventListener('click', () => {
                 this.fileHandler.downloadJSON();
             });
         }
-
-        // Form actions
-        this.bindFormActions();
-
-        // View switcher
-        this.bindViewSwitcher();
-
-        // Form inputs
-        this.bindFormInputs();
-
-        // Category buttons
-        this.bindCategoryButtons();
-    }
-
-    rebindEvents() {
-        this.bindFormActions();
-        this.bindViewSwitcher();
-        this.bindFormInputs();
-        this.bindCategoryButtons();
     }
 
     bindFormActions() {
