@@ -55,6 +55,20 @@ export class UIManager {
             ${this.state.data.semester ? `— ${this.escapeHtml(this.state.data.semester.name)}` : ''}
           </span>
         </div>
+        <div class="search-container">
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+              type="search"
+              id="search-input"
+              class="search-input"
+              placeholder="Keresés események között..."
+              autocomplete="off"
+            >
+            <button id="search-clear" class="search-clear" aria-label="Keresés törlése">×</button>
+          </div>
+          <div id="search-results-count" class="search-results-count"></div>
+        </div>
         <div class="header-right">
           <button id="upload-btn" class="btn btn-primary">
             ${Icons.Upload}

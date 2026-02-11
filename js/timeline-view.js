@@ -2,19 +2,33 @@
 
 import { Icons } from './icons.js';
 import { formatDateHu, formatDateShort } from './utils.js';
+import { SearchManager } from './search.js';
 
 export class TimelineView {
     constructor(state) {
         this.state = state;
+        this.searchManager = new SearchManager(state);
     }
 
     render() {
         const container = document.getElementById('timeline-container');
         if (!container) return;
 
-        const sortedEvents = [...this.state.data.events].sort((a, b) =>
+        // Update searchManager query from state
+        this.searchManager.searchQuery = this.state.data.searchQuery.toLowerCase().trim();
+
+        // Filter events based on search query
+        const filteredEvents = this.searchManager.filterEvents(this.state.data.events);
+
+        const sortedEvents = [...filteredEvents].sort((a, b) =>
             a.date.localeCompare(b.date)
         );
+
+        // Show empty state if no results
+        if (sortedEvents.length === 0 && this.searchManager.isSearchActive()) {
+            container.innerHTML = this.renderEmptyState();
+            return;
+        }
 
         container.innerHTML = `
       <div class="timeline">
@@ -91,6 +105,22 @@ export class TimelineView {
             link: ev.link || ''
         };
         this.state.notify('form');
+    }
+
+    renderEmptyState() {
+        return `
+      <div class="search-empty-state">
+        <div class="search-empty-state-icon">🔍</div>
+        <h3 class="search-empty-state-title">Nincs találat</h3>
+        <p class="search-empty-state-message">
+          Nem található esemény a keresett kifejezésre:
+          <strong>"${this.escapeHtml(this.searchManager.searchQuery)}"</strong>
+        </p>
+        <button id="clear-search-btn" class="search-empty-state-action">
+          Keresés törlése
+        </button>
+      </div>
+    `;
     }
 
     escapeHtml(text) {

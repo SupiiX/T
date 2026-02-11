@@ -6,6 +6,20 @@ import { CalendarView } from './calendar-view.js';
 import { TimelineView } from './timeline-view.js';
 import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
+import { SearchManager } from './search.js';
+
+// Debounce utility function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 class TimelineApp {
     constructor() {
@@ -15,6 +29,7 @@ class TimelineApp {
         this.timelineView = new TimelineView(this.state);
         this.fileHandler = new FileHandler(this.state);
         this.eventManager = new EventManager(this.state);
+        this.searchManager = new SearchManager(this.state);
 
         this.init();
     }
@@ -73,6 +88,11 @@ class TimelineApp {
                 console.log('Refreshing timeline view to update event selection');
                 this.timelineView.render();
             }
+        } else if (key === 'search') {
+            // Refresh current view when search query changes
+            console.log('Search query changed, refreshing view:', data.currentView);
+            this.switchView(data.currentView);
+            this.updateSearchUI();
         }
     }
 
@@ -82,6 +102,7 @@ class TimelineApp {
         this.bindViewSwitcher();
         this.bindFormInputs();
         this.bindCategoryButtons();
+        this.bindSearch();
     }
 
     rebindEvents() {
@@ -90,6 +111,7 @@ class TimelineApp {
         this.bindViewSwitcher();
         this.bindFormInputs();
         this.bindCategoryButtons();
+        this.bindSearch();
     }
 
     bindUploadDownload() {
@@ -188,6 +210,62 @@ class TimelineApp {
         });
     }
 
+    bindSearch() {
+        const searchInput = document.getElementById('search-input');
+        const searchClear = document.getElementById('search-clear');
+
+        if (searchInput) {
+            // Remove old event listeners by replacing the element
+            searchInput.replaceWith(searchInput.cloneNode(true));
+            const newSearchInput = document.getElementById('search-input');
+
+            // Debounced search handler
+            const handleSearch = debounce((e) => {
+                const query = e.target.value;
+                this.searchManager.setSearchQuery(query);
+            }, 300);
+
+            newSearchInput.addEventListener('input', handleSearch);
+
+            // Update clear button visibility on input
+            newSearchInput.addEventListener('input', (e) => {
+                const clearBtn = document.getElementById('search-clear');
+                if (clearBtn) {
+                    clearBtn.classList.toggle('visible', e.target.value.length > 0);
+                }
+            });
+        }
+
+        if (searchClear) {
+            searchClear.replaceWith(searchClear.cloneNode(true));
+            const newSearchClear = document.getElementById('search-clear');
+
+            newSearchClear.addEventListener('click', () => {
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                    this.searchManager.clearSearch();
+                    newSearchClear.classList.remove('visible');
+                }
+            });
+        }
+    }
+
+    updateSearchUI() {
+        const searchInput = document.getElementById('search-input');
+        const resultsCount = document.getElementById('search-results-count');
+
+        if (this.searchManager.isSearchActive() && resultsCount) {
+            const totalEvents = this.state.data.events.length;
+            const filteredCount = this.searchManager.getFilteredCount(this.state.data.events);
+
+            resultsCount.textContent = `${filteredCount} / ${totalEvents} esemény`;
+            resultsCount.classList.add('visible');
+        } else if (resultsCount) {
+            resultsCount.classList.remove('visible');
+        }
+    }
+
     switchView(view) {
         const container = document.getElementById('view-container');
         if (!container) return;
@@ -208,6 +286,22 @@ class TimelineApp {
         } else {
             container.innerHTML = '<div id="timeline-container"></div>';
             this.timelineView.render();
+
+            // Bind clear search button in empty state
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', () => {
+                    const searchInput = document.getElementById('search-input');
+                    const searchClear = document.getElementById('search-clear');
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                    if (searchClear) {
+                        searchClear.classList.remove('visible');
+                    }
+                    this.searchManager.clearSearch();
+                });
+            }
         }
     }
 }

@@ -1,11 +1,13 @@
 // Calendar view using FullCalendar
 
 import { inclusiveToExclusive, exclusiveToInclusive, formatDate } from './utils.js';
+import { SearchManager } from './search.js';
 
 export class CalendarView {
     constructor(state) {
         this.state = state;
         this.calendar = null;
+        this.searchManager = new SearchManager(state);
     }
 
     render() {
@@ -45,7 +47,14 @@ export class CalendarView {
 
     getCalendarEvents() {
         const categoryMap = this.state.getCategoryMap();
-        return this.state.data.events.map(ev => {
+
+        // Update searchManager query from state
+        this.searchManager.searchQuery = this.state.data.searchQuery.toLowerCase().trim();
+
+        // Filter events based on search query
+        const filteredEvents = this.searchManager.filterEvents(this.state.data.events);
+
+        return filteredEvents.map(ev => {
             const cat = categoryMap[ev.category];
             return {
                 id: String(ev.id),

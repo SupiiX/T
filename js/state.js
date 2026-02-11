@@ -8,7 +8,8 @@ export class AppState {
             semester: null,
             form: this.getEmptyForm(),
             fileName: '',
-            currentView: 'calendar'
+            currentView: 'calendar',
+            searchQuery: ''
         };
         this.listeners = [];
     }
@@ -98,5 +99,11 @@ export class AppState {
     resetForm() {
         this.data.form = this.getEmptyForm();
         this.notify('form');
+    }
+
+    // Update search query
+    updateSearch(query) {
+        this.data.searchQuery = query;
+        this.notify('search');
     }
 }
