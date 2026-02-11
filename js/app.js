@@ -28,14 +28,21 @@ class TimelineApp {
 
     async loadDefaultData() {
         try {
+            console.log('Loading data.json...');
             const response = await fetch('data.json');
+            console.log('Fetch response:', response.status, response.ok);
+
             if (response.ok) {
                 const data = await response.json();
+                console.log('Data loaded successfully:', data);
                 this.state.loadData(data);
                 this.state.update('fileName', 'data.json');
+            } else {
+                console.error('Failed to load data.json:', response.status);
             }
         } catch (error) {
-            console.warn('Could not load default data.json:', error);
+            console.error('Could not load default data.json:', error);
+            console.log('Please make sure you are running a local web server (e.g., python -m http.server or Live Server in VS Code)');
             // App will work without default data, user can upload their own
         }
     }
