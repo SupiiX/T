@@ -34,6 +34,7 @@ export class UIManager {
 
     renderApp() {
         const app = document.getElementById('app');
+        app.innerHTML = '';  // clear first so querySelector finds no stale elements
         app.innerHTML = `
       <div class="app-container">
         ${this.renderHeader()}
