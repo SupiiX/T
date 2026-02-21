@@ -44,21 +44,7 @@ class TimelineApp {
     }
 
     bindEvents() {
-        // Upload/download
-        const uploadBtn = document.getElementById('upload-btn');
-        const downloadBtn = document.getElementById('download-btn');
-
-        if (uploadBtn) {
-            uploadBtn.addEventListener('click', () => {
-                this.fileHandler.triggerUpload();
-            });
-        }
-
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => {
-                this.fileHandler.downloadJSON();
-            });
-        }
+        this.bindUploadDownload();
 
         // Form actions
         this.bindFormActions();
@@ -83,6 +69,7 @@ class TimelineApp {
     }
 
     rebindEvents() {
+        this.bindUploadDownload();
         this.bindFormActions();
         this.bindViewSwitcher();
         this.bindFormInputs();
@@ -90,6 +77,24 @@ class TimelineApp {
         this.bindHungarianOnly();
         this.bindSemesterInputs();
         this.bindCategoryManager();
+    }
+
+    bindUploadDownload() {
+        const uploadBtn = document.getElementById('upload-btn');
+        if (uploadBtn) {
+            uploadBtn.replaceWith(uploadBtn.cloneNode(true));
+            document.getElementById('upload-btn').addEventListener('click', () => {
+                this.fileHandler.triggerUpload();
+            });
+        }
+
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.replaceWith(downloadBtn.cloneNode(true));
+            document.getElementById('download-btn').addEventListener('click', () => {
+                this.fileHandler.downloadJSON();
+            });
+        }
     }
 
     bindFormActions() {
