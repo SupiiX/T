@@ -81,3 +81,104 @@
     text-align: center;
     border-top: 1px solid var(--color-gray-200);
 }
+
+/* Hungarian-only toggle */
+.form-field-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.form-field-toggle input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.form-field-toggle label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* Semester panel */
+.semester-panel,
+.category-panel {
+    margin-top: var(--spacing-md);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.semester-panel summary,
+.category-panel summary {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-600);
+    cursor: pointer;
+    user-select: none;
+}
+
+.semester-panel summary:hover,
+.category-panel summary:hover {
+    color: var(--color-gray-900);
+}
+
+/* Category manager */
+.category-row {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.category-row:last-of-type {
+    border-bottom: none;
+}
+
+.cat-row-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.cat-color-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cat-row-header strong {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--color-gray-800);
+}
+
+.cat-row-fields {
+    padding-left: var(--spacing-sm);
+}
+
+.cat-row-fields input[type="color"] {
+    width: 2.5rem;
+    height: 2rem;
+    padding: 0.125rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.btn-del-cat {
+    background: none;
+    border: none;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.125rem 0.25rem;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+}
+
+.btn-del-cat:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}

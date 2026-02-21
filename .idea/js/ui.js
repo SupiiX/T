@@ -26,6 +26,9 @@ export class UIManager {
             case 'fileName':
                 this.updateFileName();
                 break;
+            case 'semester':
+                this.updateSemesterHeader();
+                break;
         }
     }
 
@@ -96,6 +99,10 @@ export class UIManager {
       </div>
 
       ${this.renderEventCounter()}
+
+      ${this.renderSemesterPanel()}
+
+      ${this.renderCategoryManager()}
     `;
 
         if (sidebar) {
@@ -139,6 +146,11 @@ export class UIManager {
       <div class="form-field">
         <label>Link</label>
         <input type="url" id="form-link" value="${this.escapeHtml(form.link)}" placeholder="https://...">
+      </div>
+
+      <div class="form-field form-field-toggle">
+        <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
+        <label for="form-hungarianOnly">Csak magyar (Hungarian Only)</label>
       </div>
 
       ${this.renderBilingualFields()}
@@ -198,6 +210,85 @@ export class UIManager {
     `;
     }
 
+    renderSemesterPanel() {
+        const sem = this.state.data.semester || {};
+        return `
+      <details class="semester-panel">
+        <summary>Félév beállításai</summary>
+        <div class="bilingual-content">
+          <div class="form-field">
+            <label>Azonosító (id)</label>
+            <input type="text" id="sem-id" value="${this.escapeHtml(sem.id || '')}" placeholder="pl. 2026-tavasz">
+          </div>
+          <div class="form-field">
+            <label>Neve (HU)</label>
+            <input type="text" id="sem-name" value="${this.escapeHtml(sem.name || '')}" placeholder="pl. 2026 Tavaszi félév">
+          </div>
+          <div class="form-field">
+            <label>Name (EN)</label>
+            <input type="text" id="sem-nameEn" value="${this.escapeHtml(sem.nameEn || '')}" placeholder="e.g. 2026 Spring Semester">
+          </div>
+          <div class="form-field">
+            <label>Kezdete</label>
+            <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
+          </div>
+          <div class="form-field">
+            <label>Vége</label>
+            <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
+          </div>
+        </div>
+      </details>
+    `;
+    }
+
+    renderCategoryManager() {
+        if (this.state.data.categories.length === 0) return '';
+
+        const rows = this.state.data.categories.map(cat => `
+      <div class="category-row" data-cat-id="${this.escapeHtml(String(cat.id))}">
+        <div class="cat-row-header">
+          <span class="cat-color-dot" style="background:${cat.color}"></span>
+          <strong>${this.escapeHtml(cat.name)}</strong>
+          <button class="btn-del-cat" title="Törlés">✕</button>
+        </div>
+        <div class="cat-row-fields">
+          <div class="form-field">
+            <label>Neve (HU)</label>
+            <input type="text" class="cat-name" value="${this.escapeHtml(cat.name)}" placeholder="Magyar név">
+          </div>
+          <div class="form-field">
+            <label>Name (EN)</label>
+            <input type="text" class="cat-nameEn" value="${this.escapeHtml(cat.nameEn || '')}" placeholder="English name">
+          </div>
+          <div class="form-field">
+            <label>Szín</label>
+            <input type="color" class="cat-color" value="${cat.color}">
+          </div>
+          <div class="form-field form-field-toggle">
+            <input type="checkbox" class="cat-hu-only" ${cat.hungarianOnly ? 'checked' : ''}>
+            <label>Csak magyar (HU only)</label>
+          </div>
+          <div class="form-field form-field-toggle">
+            <input type="checkbox" class="cat-en-only" ${cat.englishOnly ? 'checked' : ''}>
+            <label>Csak angol (EN only)</label>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+        return `
+      <details class="category-panel">
+        <summary>Kategóriák kezelése</summary>
+        <div id="category-list">
+          ${rows}
+        </div>
+        <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.5rem">
+          + Új kategória
+        </button>
+      </details>
+    `;
+    }
+
     renderEventCounter() {
         if (this.state.data.events.length === 0) return '';
 
@@ -252,6 +343,13 @@ export class UIManager {
     }
 
     // Partial updates
+    updateSemesterHeader() {
+        const el = document.getElementById('semester-name');
+        if (el && this.state.data.semester) {
+            el.textContent = `— ${this.state.data.semester.name || ''}`;
+        }
+    }
+
     updateEventCounter() {
         const counter = document.querySelector('.event-counter');
         if (counter) {

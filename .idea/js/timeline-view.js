@@ -88,7 +88,8 @@ export class TimelineView {
             descriptionEn: ev.descriptionEn || '',
             location: ev.location || '',
             locationEn: ev.locationEn || '',
-            link: ev.link || ''
+            link: ev.link || '',
+            hungarianOnly: ev.hungarianOnly || false
         };
         this.state.notify('form');
     }

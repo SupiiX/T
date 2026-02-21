@@ -29,6 +29,9 @@ class TimelineApp {
         if (key === 'data-loaded' || key === 'events') {
             this.rebindEvents();
             this.switchView(data.currentView);
+        } else if (key === 'form') {
+            // Re-bind after sidebar re-render triggered by UIManager
+            this.rebindEvents();
         }
     }
 
@@ -60,6 +63,15 @@ class TimelineApp {
 
         // Category buttons
         this.bindCategoryButtons();
+
+        // Hungarian-only toggle
+        this.bindHungarianOnly();
+
+        // Semester panel inputs
+        this.bindSemesterInputs();
+
+        // Category manager
+        this.bindCategoryManager();
     }
 
     rebindEvents() {
@@ -67,6 +79,9 @@ class TimelineApp {
         this.bindViewSwitcher();
         this.bindFormInputs();
         this.bindCategoryButtons();
+        this.bindHungarianOnly();
+        this.bindSemesterInputs();
+        this.bindCategoryManager();
     }
 
     bindFormActions() {
@@ -144,6 +159,86 @@ class TimelineApp {
                 this.rebindEvents();
             });
         });
+    }
+
+    bindHungarianOnly() {
+        const checkbox = document.getElementById('form-hungarianOnly');
+        if (checkbox) {
+            const newCb = checkbox.cloneNode(true);
+            checkbox.replaceWith(newCb);
+            newCb.addEventListener('change', (e) => {
+                this.state.updateFormField('hungarianOnly', e.target.checked);
+            });
+        }
+    }
+
+    bindSemesterInputs() {
+        const semFields = ['id', 'name', 'nameEn', 'startDate', 'endDate'];
+        semFields.forEach(field => {
+            const input = document.getElementById(`sem-${field}`);
+            if (input) {
+                const newInput = input.cloneNode(true);
+                input.replaceWith(newInput);
+                newInput.addEventListener('input', (e) => {
+                    this.state.updateSemester({ [field]: e.target.value });
+                });
+            }
+        });
+    }
+
+    bindCategoryManager() {
+        // Bind inline edit inputs on each category row (update on input, no re-render)
+        document.querySelectorAll('.category-row').forEach(row => {
+            const catId = row.getAttribute('data-cat-id');
+
+            const bindField = (selector, stateKey, isCheckbox = false) => {
+                const el = row.querySelector(selector);
+                if (!el) return;
+                const newEl = el.cloneNode(true);
+                el.replaceWith(newEl);
+                const evt = isCheckbox ? 'change' : 'input';
+                newEl.addEventListener(evt, (e) => {
+                    this.state.updateCategory(catId, { [stateKey]: isCheckbox ? e.target.checked : e.target.value });
+                });
+            };
+
+            bindField('.cat-name', 'name');
+            bindField('.cat-nameEn', 'nameEn');
+            bindField('.cat-color', 'color');
+            bindField('.cat-hu-only', 'hungarianOnly', true);
+            bindField('.cat-en-only', 'englishOnly', true);
+
+            // Delete button
+            const delBtn = row.querySelector('.btn-del-cat');
+            if (delBtn) {
+                const newDelBtn = delBtn.cloneNode(true);
+                delBtn.replaceWith(newDelBtn);
+                newDelBtn.addEventListener('click', () => {
+                    if (!confirm('Biztosan törölni szeretnéd ezt a kategóriát?')) return;
+                    this.state.deleteCategory(catId);
+                    this.ui.renderSidebar();
+                    this.rebindEvents();
+                });
+            }
+        });
+
+        // Add new category button
+        const addBtn = document.getElementById('add-category-btn');
+        if (addBtn) {
+            const newAddBtn = addBtn.cloneNode(true);
+            addBtn.replaceWith(newAddBtn);
+            newAddBtn.addEventListener('click', () => {
+                const newId = 'kat-' + Date.now();
+                this.state.addCategory({
+                    id: newId,
+                    name: 'Új kategória',
+                    nameEn: 'New category',
+                    color: '#888888'
+                });
+                this.ui.renderSidebar();
+                this.rebindEvents();
+            });
+        }
     }
 
     switchView(view) {

@@ -44,16 +44,26 @@ export class FileHandler {
     }
 
     downloadJSON() {
-        const output = this.state.data.semester
-            ? {
-                semester: this.state.data.semester,
-                categories: this.state.data.categories,
-                events: this.state.data.events
-            }
-            : {
-                categories: this.state.data.categories,
-                events: this.state.data.events
-            };
+        const cleanEvent = (ev) => {
+            const out = { ...ev };
+            if (!out.hungarianOnly) delete out.hungarianOnly;
+            if (!out.endDate) delete out.endDate;
+            if (!out.link) delete out.link;
+            return out;
+        };
+
+        const cleanCategory = (cat) => {
+            const out = { ...cat };
+            if (!out.hungarianOnly) delete out.hungarianOnly;
+            if (!out.englishOnly) delete out.englishOnly;
+            return out;
+        };
+
+        const output = {
+            ...(this.state.data.semester ? { semester: this.state.data.semester } : {}),
+            categories: this.state.data.categories.map(cleanCategory),
+            events: this.state.data.events.map(cleanEvent)
+        };
 
         const data = JSON.stringify(output, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
