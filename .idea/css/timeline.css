@@ -55,8 +55,11 @@
 }
 
 .timeline-item.active .timeline-card {
-    border-color: var(--color-primary);
-    background: rgba(79, 70, 229, 0.02);
+    border-color: var(--cat-color, var(--color-primary));
+    border-width: 3px;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat-color, var(--color-primary)) 20%, transparent);
+    background: white;
+    transform: translateY(-2px);
 }
 
 .timeline-card-header {

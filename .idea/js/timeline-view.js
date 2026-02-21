@@ -39,7 +39,7 @@ export class TimelineView {
         const isActive = this.state.data.form.id === ev.id;
 
         return `
-      <div id="event-${ev.id}" class="timeline-item ${isActive ? 'active' : ''}" data-event-id="${ev.id}">
+      <div id="event-${ev.id}" class="timeline-item ${isActive ? 'active' : ''}" data-event-id="${ev.id}" style="--cat-color: ${color}">
         <div class="timeline-dot" style="background-color: ${color}"></div>
         <div class="timeline-card">
           <div class="timeline-card-header">
