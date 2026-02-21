@@ -48,7 +48,8 @@ export class AppState {
             descriptionEn: '',
             location: '',
             locationEn: '',
-            link: ''
+            link: '',
+            hungarianOnly: false
         };
     }
 
@@ -83,6 +84,33 @@ export class AppState {
     deleteEvent(id) {
         this.data.events = this.data.events.filter(e => e.id !== id);
         this.notify('events');
+    }
+
+    // Update semester fields
+    updateSemester(fields) {
+        this.data.semester = { ...this.data.semester, ...fields };
+        this.notify('semester');
+    }
+
+    // Add a new category
+    addCategory(cat) {
+        this.data.categories.push(cat);
+        this.notify('categories');
+    }
+
+    // Update an existing category
+    updateCategory(id, fields) {
+        const index = this.data.categories.findIndex(c => c.id === id);
+        if (index !== -1) {
+            this.data.categories[index] = { ...this.data.categories[index], ...fields };
+            this.notify('categories');
+        }
+    }
+
+    // Delete a category
+    deleteCategory(id) {
+        this.data.categories = this.data.categories.filter(c => c.id !== id);
+        this.notify('categories');
     }
 
     // Get category map for quick lookups

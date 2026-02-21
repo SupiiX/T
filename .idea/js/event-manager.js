@@ -30,7 +30,8 @@ export class EventManager {
                 descriptionEn: form.descriptionEn,
                 location: form.location,
                 locationEn: form.locationEn,
-                link: form.link || null
+                link: form.link || null,
+                hungarianOnly: form.hungarianOnly || undefined
             });
         } else {
             // Create new event
@@ -44,7 +45,8 @@ export class EventManager {
                 descriptionEn: form.descriptionEn || '',
                 location: form.location || '',
                 locationEn: form.locationEn || '',
-                link: form.link || null
+                link: form.link || null,
+                hungarianOnly: form.hungarianOnly || undefined
             });
         }
 
