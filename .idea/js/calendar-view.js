@@ -79,7 +79,8 @@ export class CalendarView {
                 descriptionEn: original.descriptionEn || '',
                 location: original.location || '',
                 locationEn: original.locationEn || '',
-                link: original.link || ''
+                link: original.link || '',
+                hungarianOnly: original.hungarianOnly || false
             };
             this.state.notify('form');
         }
