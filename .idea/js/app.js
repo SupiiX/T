@@ -69,6 +69,9 @@ class TimelineApp {
 
         // Mobile sidebar toggle
         this.bindMobileToggle();
+
+        // New semester wizard
+        this.bindNewSemesterBtn();
     }
 
     rebindEvents() {
@@ -81,6 +84,7 @@ class TimelineApp {
         this.bindSemesterInputs();
         this.bindCategoryManager();
         this.bindMobileToggle();
+        this.bindNewSemesterBtn();
     }
 
     bindUploadDownload() {
@@ -256,6 +260,90 @@ class TimelineApp {
                 this.rebindEvents();
             });
         }
+    }
+
+    bindNewSemesterBtn() {
+        ['new-semester-btn', 'new-semester-btn-empty'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.replaceWith(btn.cloneNode(true));
+                document.getElementById(id).addEventListener('click', () => {
+                    this.openNewSemesterWizard();
+                });
+            }
+        });
+    }
+
+    openNewSemesterWizard() {
+        document.getElementById('semester-wizard')?.remove();
+        document.body.insertAdjacentHTML('beforeend', this.ui.renderNewSemesterWizard());
+        this.bindWizardEvents();
+    }
+
+    bindWizardEvents() {
+        const close = () => document.getElementById('semester-wizard')?.remove();
+
+        document.getElementById('wizard-close-btn')?.addEventListener('click', close);
+        document.getElementById('wizard-cancel-btn')?.addEventListener('click', close);
+
+        // Close on backdrop click
+        document.getElementById('semester-wizard')?.addEventListener('click', (e) => {
+            if (e.target.id === 'semester-wizard') close();
+        });
+
+        // Add category row
+        document.getElementById('wizard-add-cat-btn')?.addEventListener('click', () => {
+            const list = document.getElementById('wizard-cat-list');
+            const row = document.createElement('div');
+            row.className = 'wizard-cat-row';
+            row.innerHTML = `
+                <input type="color" class="wiz-cat-color" value="#6366f1">
+                <input type="text" class="wiz-cat-name" placeholder="Magyar név">
+                <input type="text" class="wiz-cat-nameEn" placeholder="English name">
+                <button class="btn btn-secondary btn-del-cat" style="flex-shrink:0">✕</button>
+            `;
+            row.querySelector('.btn-del-cat').addEventListener('click', () => row.remove());
+            list.appendChild(row);
+        });
+
+        document.getElementById('wizard-create-btn')?.addEventListener('click', () => {
+            this.createSemesterFromWizard();
+        });
+    }
+
+    createSemesterFromWizard() {
+        const val = id => document.getElementById(id)?.value.trim() || '';
+        const name = val('wiz-name');
+
+        if (!name) {
+            alert('Kérlek add meg a félév magyar nevét.');
+            return;
+        }
+
+        const semester = {
+            id: val('wiz-id'),
+            name,
+            nameEn: val('wiz-nameEn'),
+            startDate: val('wiz-startDate'),
+            endDate: val('wiz-endDate')
+        };
+
+        const categories = [];
+        document.querySelectorAll('.wizard-cat-row').forEach((row, i) => {
+            const catName = row.querySelector('.wiz-cat-name')?.value.trim();
+            if (!catName) return;
+            categories.push({
+                id: String(i + 1),
+                name: catName,
+                nameEn: row.querySelector('.wiz-cat-nameEn')?.value.trim() || '',
+                color: row.querySelector('.wiz-cat-color')?.value || '#6366f1'
+            });
+        });
+
+        document.getElementById('semester-wizard')?.remove();
+
+        this.state.loadData({ semester, categories, events: [] });
+        this.state.update('fileName', name.replace(/\s+/g, '_') + '.json');
     }
 
     bindMobileToggle() {

@@ -61,6 +61,10 @@ export class UIManager {
           </span>
         </div>
         <div class="header-right">
+          <button id="new-semester-btn" class="btn btn-secondary">
+            ${Icons.FilePlus}
+            <span>Új félév</span>
+          </button>
           <button id="upload-btn" class="btn btn-primary">
             ${Icons.Upload}
             <span>JSON Betöltés</span>
@@ -320,7 +324,14 @@ export class UIManager {
       <div class="empty-state">
         <div class="empty-icon">${Icons.CalendarDays}</div>
         <p class="empty-title">Nincs betöltött esemény</p>
-        <p class="empty-subtitle">Tölts be egy JSON fájlt a kezdéshez</p>
+        <p class="empty-subtitle">Hozz létre egy új félévet, vagy tölts be egy meglévő JSON fájlt</p>
+        <div class="empty-actions">
+          <button id="new-semester-btn-empty" class="btn btn-primary">
+            ${Icons.FilePlus} Új félév létrehozása
+          </button>
+          <span class="empty-or">vagy</span>
+          <span class="empty-subtitle">Betöltés a fejlécben lévő gombbal</span>
+        </div>
       </div>
     `;
     }
@@ -343,6 +354,54 @@ export class UIManager {
             '<div id="calendar-container"></div>' :
             '<div id="timeline-container"></div>'
         }
+      </div>
+    `;
+    }
+
+    renderNewSemesterWizard() {
+        return `
+      <div id="semester-wizard" class="wizard-overlay">
+        <div class="wizard-box">
+          <div class="wizard-header">
+            <h2>Új félév létrehozása</h2>
+            <button id="wizard-close-btn" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
+          </div>
+          <div class="wizard-body">
+            <p class="wizard-section-title">Félév adatai</p>
+            <div class="form-field">
+              <label>Azonosító (id)</label>
+              <input type="text" id="wiz-id" placeholder="pl. 2024-25-2">
+            </div>
+            <div class="form-field">
+              <label>Magyar neve</label>
+              <input type="text" id="wiz-name" placeholder="pl. 2024/25 tavaszi félév">
+            </div>
+            <div class="form-field">
+              <label>Angol neve (nameEn)</label>
+              <input type="text" id="wiz-nameEn" placeholder="e.g. Spring semester 2024/25">
+            </div>
+            <div class="form-field">
+              <label>Kezdő dátum</label>
+              <input type="date" id="wiz-startDate">
+            </div>
+            <div class="form-field">
+              <label>Záró dátum</label>
+              <input type="date" id="wiz-endDate">
+            </div>
+
+            <p class="wizard-section-title">Kategóriák (opcionális)</p>
+            <div id="wizard-cat-list"></div>
+            <button id="wizard-add-cat-btn" class="btn btn-secondary" style="width:100%;margin-top:0.25rem">
+              + Kategória hozzáadása
+            </button>
+          </div>
+          <div class="wizard-footer">
+            <button id="wizard-create-btn" class="btn btn-primary" style="flex:1">
+              ${Icons.Save} Félév létrehozása
+            </button>
+            <button id="wizard-cancel-btn" class="btn btn-secondary">Mégse</button>
+          </div>
+        </div>
       </div>
     `;
     }
