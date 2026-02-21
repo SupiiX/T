@@ -66,6 +66,9 @@ class TimelineApp {
 
         // Category manager
         this.bindCategoryManager();
+
+        // Mobile sidebar toggle
+        this.bindMobileToggle();
     }
 
     rebindEvents() {
@@ -77,6 +80,7 @@ class TimelineApp {
         this.bindHungarianOnly();
         this.bindSemesterInputs();
         this.bindCategoryManager();
+        this.bindMobileToggle();
     }
 
     bindUploadDownload() {
@@ -252,6 +256,38 @@ class TimelineApp {
                 this.rebindEvents();
             });
         }
+    }
+
+    bindMobileToggle() {
+        const btn = document.getElementById('mobile-sidebar-btn');
+        if (btn) {
+            btn.replaceWith(btn.cloneNode(true));
+            document.getElementById('mobile-sidebar-btn').addEventListener('click', () => {
+                this.toggleMobileSidebar();
+            });
+        }
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (backdrop) {
+            backdrop.onclick = () => this.closeMobileSidebar();
+        }
+    }
+
+    toggleMobileSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const isOpen = sidebar?.classList.contains('open');
+        if (isOpen) {
+            sidebar.classList.remove('open');
+            backdrop?.classList.remove('visible');
+        } else {
+            sidebar?.classList.add('open');
+            backdrop?.classList.add('visible');
+        }
+    }
+
+    closeMobileSidebar() {
+        document.querySelector('.sidebar')?.classList.remove('open');
+        document.getElementById('sidebar-backdrop')?.classList.remove('visible');
     }
 
     switchView(view) {

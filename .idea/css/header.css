@@ -49,3 +49,33 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0 var(--spacing-md);
+    }
+
+    .app-header h1 {
+        display: none;
+    }
+
+    .semester-name {
+        display: none;
+    }
+
+    .btn span {
+        display: none;
+    }
+
+    .file-name {
+        display: none;
+    }
+
+    .header-right {
+        gap: var(--spacing-sm);
+    }
+
+    .header-left {
+        gap: var(--spacing-sm);
+    }
+}

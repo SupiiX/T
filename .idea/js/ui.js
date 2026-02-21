@@ -36,6 +36,7 @@ export class UIManager {
         const app = document.getElementById('app');
         app.innerHTML = '';  // clear first so querySelector finds no stale elements
         app.innerHTML = `
+      <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
       <div class="app-container">
         ${this.renderHeader()}
         <div class="app-layout">
@@ -50,6 +51,9 @@ export class UIManager {
         return `
       <header class="app-header">
         <div class="header-left">
+          <button id="mobile-sidebar-btn" class="btn btn-secondary mobile-only" aria-label="Form megnyitása">
+            ${Icons.Menu}
+          </button>
           <div class="header-logo">${Icons.CalendarDays}</div>
           <h1>Egyetemi Naptár Kezelő</h1>
           <span id="semester-name" class="semester-name">
