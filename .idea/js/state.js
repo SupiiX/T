@@ -29,10 +29,9 @@ export class AppState {
         this.notify(key);
     }
 
-    // Update a single form field
+    // Update a single form field (silent – no re-render needed for keystrokes)
     updateFormField(field, value) {
         this.data.form[field] = value;
-        this.notify('form');
     }
 
     // Get empty form template
