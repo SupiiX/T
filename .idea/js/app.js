@@ -32,6 +32,14 @@ class TimelineApp {
         } else if (key === 'form') {
             // Re-bind after sidebar re-render triggered by UIManager
             this.rebindEvents();
+            // Update active highlight in timeline without full re-render
+            if (this.state.data.currentView === 'timeline') {
+                const activeId = this.state.data.form.id;
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    const evId = Number(item.getAttribute('data-event-id'));
+                    item.classList.toggle('active', evId === activeId);
+                });
+            }
         }
     }
 
@@ -256,9 +264,12 @@ class TimelineApp {
 
         // Render appropriate view
         if (view === 'calendar') {
+            // Destroy and reinit calendar so it always mounts into the fresh container
+            this.calendarView.destroy();
             container.innerHTML = '<div id="calendar-container"></div>';
             this.calendarView.render();
         } else {
+            this.calendarView.destroy();
             container.innerHTML = '<div id="timeline-container"></div>';
             this.timelineView.render();
         }
