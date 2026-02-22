@@ -506,11 +506,12 @@ class TimelineApp {
         if (btn) btn.disabled = true;
         try {
             const payload = JSON.stringify(this.fileHandler.buildPayload(), null, 2);
-            const res = await fetch(url, {
+            await fetch(url, {
                 method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: payload
             });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             alert('Sikeresen mentve a felhőbe!');
         } catch (e) {
             alert('Nem sikerült menteni a felhőbe:\n' + e.message);
