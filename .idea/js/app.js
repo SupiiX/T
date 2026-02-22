@@ -6,6 +6,7 @@ import { CalendarView } from './calendar-view.js';
 import { TimelineView } from './timeline-view.js';
 import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
+import { formatDateShort } from './utils.js';
 
 // Toast notification utility (also exposed globally for other modules)
 function showToast(message, type = 'info', duration = 3500) {
@@ -43,6 +44,10 @@ class TimelineApp {
         this.ui.renderApp();
         this.bindEvents();
         this.state.subscribe(this.handleStateChange.bind(this));
+        // Close search dropdown on outside click (registered once)
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.header-search-wrapper')) this.closeSearchDropdown();
+        });
     }
 
     handleStateChange(key, data) {
@@ -95,6 +100,9 @@ class TimelineApp {
 
         // Cloud buttons
         this.bindCloudButtons();
+
+        // Search
+        this.bindSearchEvents();
     }
 
     rebindEvents() {
@@ -109,6 +117,7 @@ class TimelineApp {
         this.bindMobileToggle();
         this.bindNewSemesterBtn();
         this.bindCloudButtons();
+        this.bindSearchEvents();
     }
 
     bindUploadDownload() {
@@ -402,6 +411,93 @@ class TimelineApp {
         document.getElementById('sidebar-backdrop')?.classList.remove('visible');
     }
 
+    // ── Esemény kereső ─────────────────────────────────────────────
+    bindSearchEvents() {
+        const input = document.getElementById('event-search-input');
+        if (!input) return;
+        input.replaceWith(input.cloneNode(true));
+        const fresh = document.getElementById('event-search-input');
+        fresh.addEventListener('input', () => this.handleSearchInput(fresh.value));
+        fresh.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { fresh.value = ''; this.closeSearchDropdown(); }
+        });
+    }
+
+    handleSearchInput(query) {
+        const q = query.trim().toLowerCase();
+        if (!q) { this.closeSearchDropdown(); return; }
+        const categoryMap = this.state.getCategoryMap();
+        const results = this.state.data.events
+            .filter(ev =>
+                ev.title?.toLowerCase().includes(q) ||
+                ev.titleEn?.toLowerCase().includes(q) ||
+                ev.description?.toLowerCase().includes(q) ||
+                ev.location?.toLowerCase().includes(q)
+            ).slice(0, 6);
+        this.renderSearchDropdown(results, q, categoryMap);
+    }
+
+    renderSearchDropdown(results, query, categoryMap) {
+        const wrapper = document.querySelector('.header-search-wrapper');
+        if (!wrapper) return;
+
+        let dropdown = document.getElementById('search-dropdown');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.id = 'search-dropdown';
+            dropdown.className = 'search-dropdown';
+            wrapper.appendChild(dropdown);
+        }
+
+        if (results.length === 0) {
+            dropdown.innerHTML = '<div class="search-no-result">Nincs találat</div>';
+            return;
+        }
+
+        dropdown.innerHTML = results.map(ev => {
+            const cat = categoryMap[ev.category];
+            const color = cat?.color || '#6366f1';
+            const highlightedTitle = this.highlightMatch(ev.title, query);
+            const dateMeta = formatDateShort(ev.date) + (cat ? ` · ${cat.name}` : '');
+            return `
+              <div class="search-result-item" data-event-id="${ev.id}">
+                <span class="search-result-dot" style="background:${color}"></span>
+                <div class="search-result-body">
+                  <div class="search-result-title">${highlightedTitle}</div>
+                  <div class="search-result-meta">${dateMeta}</div>
+                </div>
+              </div>`;
+        }).join('');
+
+        dropdown.querySelectorAll('.search-result-item').forEach(item => {
+            const evId = Number(item.getAttribute('data-event-id'));
+            const ev = this.state.data.events.find(e => e.id === evId);
+            if (ev) item.addEventListener('click', () => this.selectSearchResult(ev));
+        });
+    }
+
+    highlightMatch(text, query) {
+        if (!text) return '';
+        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+    }
+
+    selectSearchResult(ev) {
+        this.timelineView.handleEventClick(ev);
+        if (this.state.data.currentView === 'calendar') {
+            this.calendarView.calendar?.gotoDate(ev.date);
+        } else {
+            document.getElementById(`event-${ev.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        const input = document.getElementById('event-search-input');
+        if (input) input.value = '';
+        this.closeSearchDropdown();
+    }
+
+    closeSearchDropdown() {
+        document.getElementById('search-dropdown')?.remove();
+    }
+
     switchView(view) {
         const container = document.getElementById('view-container');
         if (!container) return;
@@ -521,6 +617,7 @@ class TimelineApp {
         this.bindUploadDownload();
         this.bindNewSemesterBtn();
         this.bindCloudButtons();
+        this.bindSearchEvents();
     }
 
     async loadFromCloud() {

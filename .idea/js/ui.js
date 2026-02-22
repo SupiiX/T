@@ -61,6 +61,13 @@ export class UIManager {
             ${this.state.data.semester ? `— ${this.escapeHtml(this.state.data.semester.name)}` : ''}
           </span>
         </div>
+        <div class="header-center">
+          <div class="header-search-wrapper">
+            <span class="header-search-icon">${Icons.Search}</span>
+            <input id="event-search-input" class="header-search-input"
+                   type="search" placeholder="Esemény keresése…" autocomplete="off">
+          </div>
+        </div>
         <div class="header-right">
           <button id="new-semester-btn" class="btn btn-secondary">
             ${Icons.FilePlus}
