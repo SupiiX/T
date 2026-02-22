@@ -453,7 +453,7 @@ class TimelineApp {
             }
         });
 
-        document.getElementById('cloud-modal-save')?.addEventListener('click', () => this.saveCloudSettings());
+        document.getElementById('cloud-modal-save')?.addEventListener('click', () => this.saveCloudSettings(close));
 
         document.getElementById('cloud-modal-delete')?.addEventListener('click', () => {
             localStorage.removeItem('calendar_script_url');
@@ -462,12 +462,33 @@ class TimelineApp {
         });
     }
 
-    saveCloudSettings() {
+    async saveCloudSettings(closeModal) {
         const url = document.getElementById('cloud-url-input')?.value.trim();
         if (!url) { alert('Kérlek add meg az URL-t.'); return; }
-        localStorage.setItem('calendar_script_url', url);
-        document.getElementById('cloud-settings-modal')?.remove();
-        this.rerenderHeader();
+
+        if (!url.startsWith('https://script.google.com/macros/s/')) {
+            alert('Az URL formátuma nem megfelelő.\n\nEgy helyes Apps Script URL így néz ki:\nhttps://script.google.com/macros/s/…/exec');
+            return;
+        }
+
+        const saveBtn = document.getElementById('cloud-modal-save');
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Tesztelés...'; }
+
+        try {
+            const res = await fetch(url, { cache: 'no-cache' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            await res.json();
+            localStorage.setItem('calendar_script_url', url);
+            closeModal?.();
+            this.rerenderHeader();
+        } catch (e) {
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Mentés'; }
+            if (e instanceof TypeError) {
+                alert('Nem sikerült csatlakozni az Apps Scripthez.\n\nEllenőrizd:\n• Helyes-e az URL?\n• "Anyone" (nem "Anyone with Google account") hozzáféréssel van-e közzétéve?\n• Van-e internet kapcsolat?');
+            } else {
+                alert('Csatlakozási hiba: ' + e.message + '\n\nEllenőrizd a Google Apps Script deployment beállításait!');
+            }
+        }
     }
 
     rerenderHeader() {
@@ -485,14 +506,24 @@ class TimelineApp {
         const btn = document.getElementById('cloud-load-btn');
         if (btn) btn.disabled = true;
         try {
-            const res = await fetch(url);
+            const res = await fetch(url, { cache: 'no-cache' });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
+            const text = await res.text();
+            if (!text || text.trim() === '{}') {
+                alert('A felhőben még nincs mentett adat.');
+                return;
+            }
+            const data = JSON.parse(text);
             this.state.loadData(data);
             const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
             this.state.update('fileName', name + '.json');
+            alert('Sikeresen betöltve a felhőből!');
         } catch (e) {
-            alert('Nem sikerült betölteni a felhőből:\n' + e.message);
+            if (e instanceof TypeError) {
+                alert('Nem sikerült csatlakozni a felhőhöz.\n\nEllenőrizd:\n• Helyes-e az Apps Script URL? (⚙ gomb)\n• A deployment "Anyone" hozzáféréssel van közzétéve?\n• Van internet kapcsolat?');
+            } else {
+                alert('Nem sikerült betölteni a felhőből:\n' + e.message);
+            }
         } finally {
             const b = document.getElementById('cloud-load-btn');
             if (b) b.disabled = false;
@@ -512,7 +543,7 @@ class TimelineApp {
                 headers: { 'Content-Type': 'text/plain' },
                 body: payload
             });
-            alert('Sikeresen mentve a felhőbe!');
+            alert('Mentés elküldve a felhőbe!\n(Az adatok a Google Sheetsben frissültek.)');
         } catch (e) {
             alert('Nem sikerült menteni a felhőbe:\n' + e.message);
         } finally {
