@@ -476,10 +476,10 @@ class TimelineApp {
 
         try {
             const testUrl = url.includes('?') ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
-            const res = await fetch(testUrl);
-            console.log('Apps Script teszt válasz:', res.status, res.ok);
-            // Nem követeljük meg JSON-t a tesztnél, csak hogy válaszolt-e
-            if (!res.ok && res.status !== 302) throw new Error(`HTTP ${res.status}`);
+            // no-cors: opaque választ kapunk, de legalább CORS nem blokkolja
+            // Ha TypeError-t dob, akkor hálózati hiba vagy rossz URL
+            await fetch(testUrl, { mode: 'no-cors' });
+            console.log('Apps Script teszt: URL elérhető');
             localStorage.setItem('calendar_script_url', url);
             closeModal?.();
             this.rerenderHeader();
