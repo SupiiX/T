@@ -33,7 +33,7 @@ export class FileHandler {
                 const data = JSON.parse(evt.target.result);
                 this.state.loadData(data);
             } catch (error) {
-                alert('Hibás JSON fájl. Kérlek tölts fel egy érvényes naptár JSON-t.');
+                window.showToast('Hibás JSON fájl! Kérlek tölts fel egy érvényes naptár fájlt.', 'error');
                 console.error('JSON parse error:', error);
             }
         };

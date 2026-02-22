@@ -7,6 +7,26 @@ import { TimelineView } from './timeline-view.js';
 import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
 
+// Toast notification utility (also exposed globally for other modules)
+function showToast(message, type = 'info', duration = 3500) {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `<span>${icons[type] ?? 'ℹ'}</span><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('toast-hiding');
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+    }, duration);
+}
+window.showToast = showToast;
+
 class TimelineApp {
     constructor() {
         this.state = new AppState();
@@ -320,7 +340,7 @@ class TimelineApp {
         const name = val('wiz-name');
 
         if (!name) {
-            alert('Kérlek add meg a félév magyar nevét.');
+            showToast('Kérlek add meg a félév nevét!', 'warning');
             return;
         }
 
@@ -464,10 +484,10 @@ class TimelineApp {
 
     async saveCloudSettings(closeModal) {
         const url = document.getElementById('cloud-url-input')?.value.trim();
-        if (!url) { alert('Kérlek add meg az URL-t.'); return; }
+        if (!url) { showToast('Kérlek add meg az URL-t!', 'warning'); return; }
 
         if (!url.startsWith('https://script.google.com/macros/s/')) {
-            alert('Az URL formátuma nem megfelelő.\n\nEgy helyes Apps Script URL így néz ki:\nhttps://script.google.com/macros/s/…/exec');
+            showToast('Hibás URL formátum. Így kell kezdődnie: https://script.google.com/macros/s/…', 'warning', 5000);
             return;
         }
 
@@ -487,9 +507,9 @@ class TimelineApp {
             console.error('Apps Script kapcsolat hiba:', e.name, e.message);
             if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Mentés'; }
             if (e instanceof TypeError) {
-                alert('Nem sikerült csatlakozni az Apps Scripthez.\n\nHiba: ' + e.message + '\n\nEllenőrizd:\n• Helyes-e az URL?\n• "Anyone" (nem "Anyone with Google account") hozzáféréssel van-e közzétéve?\n• Frissítsd az oldalt (Ctrl+Shift+R) és próbáld újra!');
+                showToast('Nem sikerült csatlakozni. Ellenőrizd az URL-t és az „Anyone" hozzáférést!', 'error', 6000);
             } else {
-                alert('Csatlakozási hiba: ' + e.message + '\n\nEllenőrizd a Google Apps Script deployment beállításait!');
+                showToast('Csatlakozási hiba: ' + e.message, 'error', 5000);
             }
         }
     }
@@ -513,19 +533,19 @@ class TimelineApp {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const text = await res.text();
             if (!text || text.trim() === '{}') {
-                alert('A felhőben még nincs mentett adat.');
+                showToast('A felhőben még nincs mentett adat.', 'info');
                 return;
             }
             const data = JSON.parse(text);
             this.state.loadData(data);
             const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
             this.state.update('fileName', name + '.json');
-            alert('Sikeresen betöltve a felhőből!');
+            showToast('Sikeresen betöltve a felhőből!', 'success');
         } catch (e) {
             if (e instanceof TypeError) {
-                alert('Nem sikerült csatlakozni a felhőhöz.\n\nEllenőrizd:\n• Helyes-e az Apps Script URL? (⚙ gomb)\n• A deployment "Anyone" hozzáféréssel van közzétéve?\n• Van internet kapcsolat?');
+                showToast('Nem sikerült csatlakozni a felhőhöz. Ellenőrizd az URL-t és az internet kapcsolatot!', 'error', 6000);
             } else {
-                alert('Nem sikerült betölteni a felhőből:\n' + e.message);
+                showToast('Betöltési hiba: ' + e.message, 'error', 5000);
             }
         } finally {
             const b = document.getElementById('cloud-load-btn');
@@ -546,9 +566,9 @@ class TimelineApp {
                 headers: { 'Content-Type': 'text/plain' },
                 body: payload
             });
-            alert('Mentés elküldve a felhőbe!\n(Az adatok a Google Sheetsben frissültek.)');
+            showToast('Mentve a felhőbe!', 'success');
         } catch (e) {
-            alert('Nem sikerült menteni a felhőbe:\n' + e.message);
+            showToast('Nem sikerült menteni: ' + e.message, 'error', 5000);
         } finally {
             const b = document.getElementById('cloud-save-btn');
             if (b) b.disabled = false;

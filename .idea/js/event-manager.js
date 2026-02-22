@@ -10,11 +10,11 @@ export class EventManager {
 
         // Validation
         if (!form.title.trim()) {
-            alert('Kérlek adj meg egy eseménynevet.');
+            window.showToast('Add meg az esemény nevét!', 'warning');
             return;
         }
         if (!form.date) {
-            alert('Kérlek válassz egy kezdő dátumot.');
+            window.showToast('Adj meg egy kezdő dátumot!', 'warning');
             return;
         }
 
@@ -33,6 +33,7 @@ export class EventManager {
                 link: form.link || null,
                 hungarianOnly: form.hungarianOnly || undefined
             });
+            window.showToast('Esemény módosítva!', 'success');
         } else {
             // Create new event
             this.state.addEvent({
@@ -48,6 +49,7 @@ export class EventManager {
                 link: form.link || null,
                 hungarianOnly: form.hungarianOnly || undefined
             });
+            window.showToast('Esemény hozzáadva!', 'success');
         }
 
         this.clearForm();
@@ -61,6 +63,7 @@ export class EventManager {
 
         this.state.deleteEvent(form.id);
         this.clearForm();
+        window.showToast('Esemény törölve.', 'success');
     }
 
     clearForm() {
