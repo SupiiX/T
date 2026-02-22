@@ -475,7 +475,7 @@ class TimelineApp {
         if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Tesztelés...'; }
 
         try {
-            const res = await fetch(url, { cache: 'no-cache' });
+            const res = await fetch(`${url}?t=${Date.now()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             await res.json();
             localStorage.setItem('calendar_script_url', url);
@@ -506,7 +506,7 @@ class TimelineApp {
         const btn = document.getElementById('cloud-load-btn');
         if (btn) btn.disabled = true;
         try {
-            const res = await fetch(url, { cache: 'no-cache' });
+            const res = await fetch(`${url}?t=${Date.now()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const text = await res.text();
             if (!text || text.trim() === '{}') {
