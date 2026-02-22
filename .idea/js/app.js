@@ -475,16 +475,19 @@ class TimelineApp {
         if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Tesztelés...'; }
 
         try {
-            const res = await fetch(`${url}?t=${Date.now()}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            await res.json();
+            const testUrl = url.includes('?') ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
+            const res = await fetch(testUrl);
+            console.log('Apps Script teszt válasz:', res.status, res.ok);
+            // Nem követeljük meg JSON-t a tesztnél, csak hogy válaszolt-e
+            if (!res.ok && res.status !== 302) throw new Error(`HTTP ${res.status}`);
             localStorage.setItem('calendar_script_url', url);
             closeModal?.();
             this.rerenderHeader();
         } catch (e) {
+            console.error('Apps Script kapcsolat hiba:', e.name, e.message);
             if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Mentés'; }
             if (e instanceof TypeError) {
-                alert('Nem sikerült csatlakozni az Apps Scripthez.\n\nEllenőrizd:\n• Helyes-e az URL?\n• "Anyone" (nem "Anyone with Google account") hozzáféréssel van-e közzétéve?\n• Van-e internet kapcsolat?');
+                alert('Nem sikerült csatlakozni az Apps Scripthez.\n\nHiba: ' + e.message + '\n\nEllenőrizd:\n• Helyes-e az URL?\n• "Anyone" (nem "Anyone with Google account") hozzáféréssel van-e közzétéve?\n• Frissítsd az oldalt (Ctrl+Shift+R) és próbáld újra!');
             } else {
                 alert('Csatlakozási hiba: ' + e.message + '\n\nEllenőrizd a Google Apps Script deployment beállításait!');
             }
