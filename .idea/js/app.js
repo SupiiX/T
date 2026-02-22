@@ -72,6 +72,9 @@ class TimelineApp {
 
         // New semester wizard
         this.bindNewSemesterBtn();
+
+        // Cloud buttons
+        this.bindCloudButtons();
     }
 
     rebindEvents() {
@@ -85,6 +88,7 @@ class TimelineApp {
         this.bindCategoryManager();
         this.bindMobileToggle();
         this.bindNewSemesterBtn();
+        this.bindCloudButtons();
     }
 
     bindUploadDownload() {
@@ -401,6 +405,118 @@ class TimelineApp {
             this.calendarView.destroy();
             container.innerHTML = '<div id="timeline-container"></div>';
             this.timelineView.render();
+        }
+    }
+
+    bindCloudButtons() {
+        const s = document.getElementById('cloud-settings-btn');
+        if (s) {
+            s.replaceWith(s.cloneNode(true));
+            document.getElementById('cloud-settings-btn').addEventListener('click', () => this.openCloudSettings());
+        }
+
+        const l = document.getElementById('cloud-load-btn');
+        if (l) {
+            l.replaceWith(l.cloneNode(true));
+            document.getElementById('cloud-load-btn').addEventListener('click', () => this.loadFromCloud());
+        }
+
+        const sv = document.getElementById('cloud-save-btn');
+        if (sv) {
+            sv.replaceWith(sv.cloneNode(true));
+            document.getElementById('cloud-save-btn').addEventListener('click', () => this.saveToCloud());
+        }
+    }
+
+    openCloudSettings() {
+        document.getElementById('cloud-settings-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', this.ui.renderCloudSettingsModal());
+        this.bindCloudSettingsEvents();
+    }
+
+    bindCloudSettingsEvents() {
+        const close = () => document.getElementById('cloud-settings-modal')?.remove();
+
+        document.getElementById('cloud-modal-close')?.addEventListener('click', close);
+        document.getElementById('cloud-modal-cancel')?.addEventListener('click', close);
+
+        // Close on backdrop click
+        document.getElementById('cloud-settings-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'cloud-settings-modal') close();
+        });
+
+        // Toggle password visibility
+        document.getElementById('cloud-url-toggle')?.addEventListener('click', () => {
+            const input = document.getElementById('cloud-url-input');
+            if (input) {
+                input.type = input.type === 'password' ? 'text' : 'password';
+            }
+        });
+
+        document.getElementById('cloud-modal-save')?.addEventListener('click', () => this.saveCloudSettings());
+
+        document.getElementById('cloud-modal-delete')?.addEventListener('click', () => {
+            localStorage.removeItem('calendar_script_url');
+            close();
+            this.rerenderHeader();
+        });
+    }
+
+    saveCloudSettings() {
+        const url = document.getElementById('cloud-url-input')?.value.trim();
+        if (!url) { alert('Kérlek add meg az URL-t.'); return; }
+        localStorage.setItem('calendar_script_url', url);
+        document.getElementById('cloud-settings-modal')?.remove();
+        this.rerenderHeader();
+    }
+
+    rerenderHeader() {
+        const header = document.querySelector('.app-header');
+        if (!header) return;
+        header.outerHTML = this.ui.renderHeader();
+        this.bindUploadDownload();
+        this.bindNewSemesterBtn();
+        this.bindCloudButtons();
+    }
+
+    async loadFromCloud() {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) return;
+        const btn = document.getElementById('cloud-load-btn');
+        if (btn) btn.disabled = true;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            this.state.loadData(data);
+            const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
+            this.state.update('fileName', name + '.json');
+        } catch (e) {
+            alert('Nem sikerült betölteni a felhőből:\n' + e.message);
+        } finally {
+            const b = document.getElementById('cloud-load-btn');
+            if (b) b.disabled = false;
+        }
+    }
+
+    async saveToCloud() {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) return;
+        const btn = document.getElementById('cloud-save-btn');
+        if (btn) btn.disabled = true;
+        try {
+            const payload = JSON.stringify(this.fileHandler.buildPayload(), null, 2);
+            const res = await fetch(url, {
+                method: 'POST',
+                body: payload
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            alert('Sikeresen mentve a felhőbe!');
+        } catch (e) {
+            alert('Nem sikerült menteni a felhőbe:\n' + e.message);
+        } finally {
+            const b = document.getElementById('cloud-save-btn');
+            if (b) b.disabled = false;
         }
     }
 }

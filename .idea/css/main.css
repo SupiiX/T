@@ -368,6 +368,29 @@ svg {
     color: var(--color-gray-400);
 }
 
+/* ── Cloud URL field ────────────────────────────────── */
+.cloud-url-field {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+    margin-top: var(--spacing-xs);
+}
+
+.cloud-url-field input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    font-family: monospace;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+}
+
+.cloud-help-text {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    margin-top: var(--spacing-sm);
+}
+
 /* ── Mobile layout ──────────────────────────────────── */
 @media (max-width: 768px) {
     .mobile-only {

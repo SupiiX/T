@@ -43,7 +43,7 @@ export class FileHandler {
         e.target.value = '';
     }
 
-    downloadJSON() {
+    buildPayload() {
         const cleanEvent = (ev) => {
             const out = { ...ev };
             if (!out.hungarianOnly) delete out.hungarianOnly;
@@ -59,13 +59,15 @@ export class FileHandler {
             return out;
         };
 
-        const output = {
+        return {
             ...(this.state.data.semester ? { semester: this.state.data.semester } : {}),
             categories: this.state.data.categories.map(cleanCategory),
             events: this.state.data.events.map(cleanEvent)
         };
+    }
 
-        const data = JSON.stringify(output, null, 2);
+    downloadJSON() {
+        const data = JSON.stringify(this.buildPayload(), null, 2);
         const blob = new Blob([data], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

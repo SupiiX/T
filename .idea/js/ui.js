@@ -48,6 +48,7 @@ export class UIManager {
     }
 
     renderHeader() {
+        const hasCloud = !!localStorage.getItem('calendar_script_url');
         return `
       <header class="app-header">
         <div class="header-left">
@@ -65,6 +66,21 @@ export class UIManager {
             ${Icons.FilePlus}
             <span>Új félév</span>
           </button>
+          ${hasCloud ? `
+          <button id="cloud-load-btn" class="btn btn-secondary">
+            ${Icons.CloudDownload} <span>Betöltés</span>
+          </button>
+          <button id="cloud-save-btn" class="btn btn-secondary">
+            ${Icons.CloudUpload} <span>Mentés</span>
+          </button>
+          <button id="cloud-settings-btn" class="btn btn-secondary icon-only" aria-label="Felhő beállítása">
+            ${Icons.Settings}
+          </button>
+          ` : `
+          <button id="cloud-settings-btn" class="btn btn-secondary">
+            ${Icons.Cloud} <span>Felhő beállítása</span>
+          </button>
+          `}
           <button id="upload-btn" class="btn btn-primary">
             ${Icons.Upload}
             <span>JSON Betöltés</span>
@@ -78,6 +94,44 @@ export class UIManager {
           </span>
         </div>
       </header>
+    `;
+    }
+
+    renderCloudSettingsModal() {
+        const existingUrl = localStorage.getItem('calendar_script_url') || '';
+        const hasUrl = !!existingUrl;
+        return `
+      <div id="cloud-settings-modal" class="wizard-overlay">
+        <div class="wizard-box" style="width:460px">
+          <div class="wizard-header">
+            <h2>Felhő kapcsolat beállítása</h2>
+            <button id="cloud-modal-close" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
+          </div>
+          <div class="wizard-body">
+            <div class="form-field">
+              <label>Apps Script URL</label>
+              <div class="cloud-url-field">
+                <input type="password" id="cloud-url-input"
+                       value="${this.escapeHtml(existingUrl)}"
+                       placeholder="https://script.google.com/macros/s/…">
+                <button id="cloud-url-toggle" class="btn btn-secondary" type="button" aria-label="Megjelenítés/elrejtés">👁</button>
+              </div>
+            </div>
+            <p class="cloud-help-text">
+              Az Apps Script deploy URL-t az adminisztrátortól kérheted el.
+            </p>
+          </div>
+          <div class="wizard-footer" style="justify-content:space-between">
+            <div>
+              ${hasUrl ? `<button id="cloud-modal-delete" class="btn btn-danger">Kapcsolat törlése</button>` : ''}
+            </div>
+            <div style="display:flex;gap:0.5rem">
+              <button id="cloud-modal-cancel" class="btn btn-secondary">Mégse</button>
+              <button id="cloud-modal-save" class="btn btn-primary">${Icons.Save} Mentés</button>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
     }
 
