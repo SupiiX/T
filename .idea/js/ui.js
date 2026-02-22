@@ -118,7 +118,7 @@ export class UIManager {
               </div>
             </div>
             <p class="cloud-help-text">
-              Az Apps Script deploy URL-t az adminisztrátortól kérheted el.
+              Az Apps Script deploymentnél <strong>Who has access: Anyone</strong> (nem "Anyone with Google account") beállítás szükséges, különben a kapcsolat nem működik.
             </p>
           </div>
           <div class="wizard-footer" style="justify-content:space-between">
