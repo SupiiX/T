@@ -56,7 +56,7 @@ export class UIManager {
             ${Icons.Menu}
           </button>
           <div class="header-logo">${Icons.CalendarDays}</div>
-          <h1>Egyetemi Naptár Kezelő</h1>
+          <h1>Naptár Kezelő</h1>
           <span id="semester-name" class="semester-name">
             ${this.state.data.semester ? `— ${this.escapeHtml(this.state.data.semester.name)}` : ''}
           </span>
@@ -220,7 +220,7 @@ export class UIManager {
 
       <div class="form-field form-field-toggle">
         <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
-        <label for="form-hungarianOnly">Csak magyar (Hungarian Only)</label>
+        <label for="form-hungarianOnly">Csak magyar</label>
       </div>
 
       ${this.renderBilingualFields()}
@@ -261,18 +261,18 @@ export class UIManager {
 
         return `
       <details class="bilingual-fields">
-        <summary>Angol mezők (English)</summary>
+        <summary>Angol mezők</summary>
         <div class="bilingual-content">
           <div class="form-field">
-            <label>Title (EN)</label>
+            <label>Title</label>
             <input type="text" id="form-titleEn" value="${this.escapeHtml(form.titleEn)}" placeholder="English title">
           </div>
           <div class="form-field">
-            <label>Description (EN)</label>
+            <label>Description</label>
             <input type="text" id="form-descriptionEn" value="${this.escapeHtml(form.descriptionEn)}" placeholder="English description">
           </div>
           <div class="form-field">
-            <label>Location (EN)</label>
+            <label>Location</label>
             <input type="text" id="form-locationEn" value="${this.escapeHtml(form.locationEn)}" placeholder="English location">
           </div>
         </div>
@@ -295,7 +295,7 @@ export class UIManager {
             <input type="text" id="sem-name" value="${this.escapeHtml(sem.name || '')}" placeholder="pl. 2026 Tavaszi félév">
           </div>
           <div class="form-field">
-            <label>Name (EN)</label>
+            <label>Name</label>
             <input type="text" id="sem-nameEn" value="${this.escapeHtml(sem.nameEn || '')}" placeholder="e.g. 2026 Spring Semester">
           </div>
           <div class="form-field">
@@ -327,7 +327,7 @@ export class UIManager {
             <input type="text" class="cat-name" value="${this.escapeHtml(cat.name)}" placeholder="Magyar név">
           </div>
           <div class="form-field">
-            <label>Name (EN)</label>
+            <label>Name</label>
             <input type="text" class="cat-nameEn" value="${this.escapeHtml(cat.nameEn || '')}" placeholder="English name">
           </div>
           <div class="form-field">
@@ -336,11 +336,11 @@ export class UIManager {
           </div>
           <div class="form-field form-field-toggle">
             <input type="checkbox" class="cat-hu-only" ${cat.hungarianOnly ? 'checked' : ''}>
-            <label>Csak magyar (HU only)</label>
+            <label>Csak magyar</label>
           </div>
           <div class="form-field form-field-toggle">
             <input type="checkbox" class="cat-en-only" ${cat.englishOnly ? 'checked' : ''}>
-            <label>Csak angol (EN only)</label>
+            <label>Csak angol</label>
           </div>
         </div>
       </div>
