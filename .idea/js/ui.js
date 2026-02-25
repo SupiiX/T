@@ -124,9 +124,6 @@ export class UIManager {
                 <button id="cloud-url-toggle" class="btn btn-secondary" type="button" aria-label="Megjelenítés/elrejtés">👁</button>
               </div>
             </div>
-            <p class="cloud-help-text">
-              Az Apps Script deploymentnél <strong>Who has access: Anyone</strong> (nem "Anyone with Google account") beállítás szükséges, különben a kapcsolat nem működik.
-            </p>
           </div>
           <div class="wizard-footer" style="justify-content:space-between">
             <div>
