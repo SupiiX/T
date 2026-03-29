@@ -7,6 +7,7 @@ import { TimelineView } from './timeline-view.js';
 import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
 import { formatDateShort } from './utils.js';
+import { Icons } from './icons.js';
 
 // Toast notification utility (also exposed globally for other modules)
 function showToast(message, type = 'info', duration = 3500) {
@@ -16,15 +17,26 @@ function showToast(message, type = 'info', duration = 3500) {
         container.id = 'toast-container';
         document.body.appendChild(container);
     }
-    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    const toastIcons = {
+        success: Icons.CheckCircle,
+        error: Icons.XCircle,
+        warning: Icons.AlertTriangle,
+        info: Icons.Info
+    };
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span>${icons[type] ?? 'ℹ'}</span><span>${message}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
+    toast.innerHTML = `
+        <span class="toast-icon">${toastIcons[type] ?? Icons.Info}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" aria-label="Bezárás">${Icons.X}</button>
+    `;
+    const dismiss = () => {
         toast.classList.add('toast-hiding');
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
-    }, duration);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', dismiss);
+    container.appendChild(toast);
+    setTimeout(dismiss, duration);
 }
 window.showToast = showToast;
 
