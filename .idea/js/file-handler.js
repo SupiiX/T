@@ -32,6 +32,7 @@ export class FileHandler {
             try {
                 const data = JSON.parse(evt.target.result);
                 this.state.loadData(data);
+                window.showToast(`Betöltve: ${file.name}`, 'success');
             } catch (error) {
                 window.showToast('Hibás JSON fájl! Kérlek tölts fel egy érvényes naptár fájlt.', 'error');
                 console.error('JSON parse error:', error);
@@ -75,5 +76,6 @@ export class FileHandler {
         a.download = this.state.data.fileName || 'naptar.json';
         a.click();
         URL.revokeObjectURL(url);
+        window.showToast(`Letöltve: ${this.state.data.fileName || 'naptar.json'}`, 'success');
     }
 }
