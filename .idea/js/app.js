@@ -87,39 +87,18 @@ class TimelineApp {
 
     bindEvents() {
         this.bindUploadDownload();
-
-        // Form actions
         this.bindFormActions();
-
-        // View switcher
         this.bindViewSwitcher();
-
-        // Form inputs
         this.bindFormInputs();
-
-        // Category buttons
         this.bindCategoryButtons();
-
-        // Hungarian-only toggle
         this.bindHungarianOnly();
-
-        // Semester panel inputs
         this.bindSemesterInputs();
-
-        // Category manager
         this.bindCategoryManager();
-
-        // Mobile sidebar toggle
         this.bindMobileToggle();
-
-        // New semester wizard
         this.bindNewSemesterBtn();
-
-        // Cloud buttons
         this.bindCloudButtons();
-
-        // Search
         this.bindSearchEvents();
+        this.bindSidebarTabs();
     }
 
     rebindEvents() {
@@ -135,6 +114,18 @@ class TimelineApp {
         this.bindNewSemesterBtn();
         this.bindCloudButtons();
         this.bindSearchEvents();
+        this.bindSidebarTabs();
+    }
+
+    bindSidebarTabs() {
+        document.querySelectorAll('.sidebar-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.getAttribute('data-tab');
+                this.ui.setActiveTab(tab);
+                this.ui.renderSidebar();
+                this.rebindEvents();
+            });
+        });
     }
 
     bindUploadDownload() {

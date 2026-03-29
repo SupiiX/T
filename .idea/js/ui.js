@@ -5,7 +5,12 @@ import { Icons } from './icons.js';
 export class UIManager {
     constructor(state) {
         this.state = state;
+        this.activeTab = 'event';
         this.state.subscribe(this.handleStateChange.bind(this));
+    }
+
+    setActiveTab(tab) {
+        this.activeTab = tab;
     }
 
     handleStateChange(key, data) {
@@ -18,6 +23,10 @@ export class UIManager {
                 }
                 break;
             case 'form':
+                // Ha eseményt kattintottak szerkesztésre, váltsunk az Esemény fülre
+                if (data.form.id !== null) {
+                    this.activeTab = 'event';
+                }
                 this.renderSidebar();
                 break;
             case 'data-loaded':
@@ -140,16 +149,38 @@ export class UIManager {
     }
 
     renderSidebar() {
-        const isEditing = this.state.data.form.id !== null;
         const sidebar = document.querySelector('.sidebar');
-        const form = this.state.data.form;
+        const catCount = this.state.data.categories.length;
 
         const content = `
-      <div class="sidebar-header">
+      <nav class="sidebar-tabs">
+        <button class="sidebar-tab ${this.activeTab === 'event' ? 'active' : ''}" data-tab="event">
+          Esemény
+        </button>
+        <button class="sidebar-tab ${this.activeTab === 'settings' ? 'active' : ''}" data-tab="settings">
+          Adatok${catCount > 0 ? `<span class="tab-count">${catCount}</span>` : ''}
+        </button>
+      </nav>
+      ${this.activeTab === 'event' ? this.renderEventTab() : this.renderSettingsTab()}
+    `;
+
+        if (sidebar) {
+            sidebar.innerHTML = content;
+        } else {
+            return `<aside class="sidebar">${content}</aside>`;
+        }
+    }
+
+    renderEventTab() {
+        const isEditing = this.state.data.form.id !== null;
+        const form = this.state.data.form;
+
+        return `
+      <div class="tab-context ${isEditing ? 'context-edit' : 'context-new'}">
         <span class="sidebar-badge ${isEditing ? 'badge-edit' : 'badge-new'}">
           ${isEditing ? 'Szerkesztés' : 'Új esemény'}
         </span>
-        <h2>${isEditing ? this.escapeHtml(form.title || 'Névtelen esemény') : 'Esemény hozzáadása'}</h2>
+        ${isEditing ? `<span class="context-title">${this.escapeHtml(form.title || 'Névtelen esemény')}</span>` : ''}
       </div>
 
       <div class="sidebar-body">
@@ -172,19 +203,17 @@ export class UIManager {
           </div>
         </div>
       </div>
-
-      ${this.renderEventCounter()}
-
-      ${this.renderSemesterPanel()}
-
-      ${this.renderCategoryManager()}
     `;
+    }
 
-        if (sidebar) {
-            sidebar.innerHTML = content;
-        } else {
-            return `<aside class="sidebar">${content}</aside>`;
-        }
+    renderSettingsTab() {
+        return `
+      <div class="sidebar-body settings-body">
+        ${this.renderSemesterSection()}
+        ${this.renderCategoryCards()}
+        ${this.renderEventCounter()}
+      </div>
+    `;
     }
 
     renderFormFields() {
@@ -239,7 +268,9 @@ export class UIManager {
     }
 
     renderCategoryButtons() {
-        if (this.state.data.categories.length === 0) return '';
+        if (this.state.data.categories.length === 0) return `
+      <p class="no-categories-hint">Kategóriák az <strong>Adatok</strong> fülön adhatók hozzá.</p>
+    `;
 
         const form = this.state.data.form;
 
@@ -294,101 +325,98 @@ export class UIManager {
     `;
     }
 
-    renderSemesterPanel() {
+    renderSemesterSection() {
         const sem = this.state.data.semester || {};
         return `
-      <details class="accordion">
-        <summary class="accordion-summary">
-          <span>Félév beállításai</span>
-          <span class="accordion-chevron">${Icons.ChevronDown}</span>
-        </summary>
-        <div class="accordion-body">
-          <div class="form-field">
-            <label>Azonosító (id)</label>
-            <input type="text" id="sem-id" value="${this.escapeHtml(sem.id || '')}" placeholder="pl. 2026-tavasz">
-          </div>
+      <div class="settings-section">
+        <p class="section-label">Félév</p>
+        <div class="form-field">
+          <label>Azonosító</label>
+          <input type="text" id="sem-id" value="${this.escapeHtml(sem.id || '')}" placeholder="pl. 2026-tavasz">
+        </div>
+        <div class="form-row">
           <div class="form-field">
             <label>Neve (HU)</label>
-            <input type="text" id="sem-name" value="${this.escapeHtml(sem.name || '')}" placeholder="pl. 2026 Tavaszi félév">
+            <input type="text" id="sem-name" value="${this.escapeHtml(sem.name || '')}" placeholder="pl. 2026 Tavasz">
           </div>
           <div class="form-field">
             <label>Name (EN)</label>
-            <input type="text" id="sem-nameEn" value="${this.escapeHtml(sem.nameEn || '')}" placeholder="e.g. 2026 Spring Semester">
-          </div>
-          <div class="form-row">
-            <div class="form-field">
-              <label>Kezdete</label>
-              <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
-            </div>
-            <div class="form-field">
-              <label>Vége</label>
-              <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
-            </div>
+            <input type="text" id="sem-nameEn" value="${this.escapeHtml(sem.nameEn || '')}" placeholder="e.g. Spring 2026">
           </div>
         </div>
-      </details>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Kezdete</label>
+            <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
+          </div>
+          <div class="form-field">
+            <label>Vége</label>
+            <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
+          </div>
+        </div>
+      </div>
     `;
     }
 
-    renderCategoryManager() {
-        if (this.state.data.categories.length === 0) return '';
+    renderCategoryCards() {
+        const cats = this.state.data.categories;
 
-        const rows = this.state.data.categories.map(cat => `
-      <div class="category-row" data-cat-id="${this.escapeHtml(String(cat.id))}">
-        <div class="cat-row-header">
-          <span class="cat-color-dot" style="background:${cat.color}"></span>
-          <strong>${this.escapeHtml(cat.name)}</strong>
+        const cards = cats.map(cat => `
+      <div class="cat-card" data-cat-id="${this.escapeHtml(String(cat.id))}">
+        <div class="cat-card-top">
+          <input type="color" class="cat-color cat-color-swatch" value="${cat.color}" title="Szín">
+          <span class="cat-card-name">${this.escapeHtml(cat.name)}</span>
           <button class="btn-del-cat" title="Törlés">✕</button>
         </div>
-        <div class="cat-row-fields">
-          <div class="form-field">
-            <label>Neve (HU)</label>
-            <input type="text" class="cat-name" value="${this.escapeHtml(cat.name)}" placeholder="Magyar név">
+        <div class="cat-card-fields">
+          <div class="form-row">
+            <div class="form-field">
+              <label>HU</label>
+              <input type="text" class="cat-name" value="${this.escapeHtml(cat.name)}" placeholder="Magyar név">
+            </div>
+            <div class="form-field">
+              <label>EN</label>
+              <input type="text" class="cat-nameEn" value="${this.escapeHtml(cat.nameEn || '')}" placeholder="English name">
+            </div>
           </div>
-          <div class="form-field">
-            <label>Name</label>
-            <input type="text" class="cat-nameEn" value="${this.escapeHtml(cat.nameEn || '')}" placeholder="English name">
-          </div>
-          <div class="form-field">
-            <label>Szín</label>
-            <input type="color" class="cat-color" value="${cat.color}">
-          </div>
-          <div class="form-field form-field-toggle">
-            <input type="checkbox" class="cat-hu-only" ${cat.hungarianOnly ? 'checked' : ''}>
-            <label>Csak magyar</label>
-          </div>
-          <div class="form-field form-field-toggle">
-            <input type="checkbox" class="cat-en-only" ${cat.englishOnly ? 'checked' : ''}>
-            <label>Csak angol</label>
+          <div class="cat-card-flags">
+            <label class="flag-toggle">
+              <input type="checkbox" class="cat-hu-only" ${cat.hungarianOnly ? 'checked' : ''}>
+              <span>Csak HU</span>
+            </label>
+            <label class="flag-toggle">
+              <input type="checkbox" class="cat-en-only" ${cat.englishOnly ? 'checked' : ''}>
+              <span>Csak EN</span>
+            </label>
           </div>
         </div>
       </div>
     `).join('');
 
         return `
-      <details class="accordion">
-        <summary class="accordion-summary">
-          <span>Kategóriák kezelése</span>
-          <span class="accordion-chevron">${Icons.ChevronDown}</span>
-        </summary>
-        <div class="accordion-body">
-          <div id="category-list">
-            ${rows}
-          </div>
-          <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.75rem">
-            + Új kategória
-          </button>
-        </div>
-      </details>
+      <div class="settings-section">
+        <p class="section-label">Kategóriák</p>
+        ${cats.length === 0 ? `
+          <p class="settings-empty">Még nincs kategória. Adj hozzá egyet!</p>
+        ` : `
+          <div id="category-list">${cards}</div>
+        `}
+        <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.5rem">
+          + Új kategória
+        </button>
+      </div>
     `;
     }
 
     renderEventCounter() {
-        if (this.state.data.events.length === 0) return '';
+        const evCount = this.state.data.events.length;
+        const catCount = this.state.data.categories.length;
+        if (evCount === 0 && catCount === 0) return '';
 
         return `
       <div class="event-counter">
-        ${this.state.data.events.length} esemény betöltve${this.state.data.categories.length > 0 ? `, ${this.state.data.categories.length} kategória` : ''}
+        <span>${evCount} esemény</span>
+        ${catCount > 0 ? `<span class="counter-dot">·</span><span>${catCount} kategória</span>` : ''}
       </div>
     `;
     }
