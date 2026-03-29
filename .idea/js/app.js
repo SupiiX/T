@@ -48,6 +48,10 @@ class TimelineApp {
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.header-search-wrapper')) this.closeSearchDropdown();
         });
+        // Auto-load from cloud if URL is already configured
+        if (localStorage.getItem('calendar_script_url')) {
+            this.loadFromCloud();
+        }
     }
 
     handleStateChange(key, data) {
@@ -638,6 +642,9 @@ class TimelineApp {
     async loadFromCloud() {
         const url = localStorage.getItem('calendar_script_url');
         if (!url) return;
+        if (this.state.data.events.length > 0) {
+            if (!confirm('A felhőből való betöltés felülírja a jelenlegi adatokat. Biztosan folytatod?')) return;
+        }
         const btn = document.getElementById('cloud-load-btn');
         if (btn) btn.disabled = true;
         this.showLoadingOverlay();
