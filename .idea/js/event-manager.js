@@ -17,6 +17,10 @@ export class EventManager {
             window.showToast('Adj meg egy kezdő dátumot!', 'warning');
             return;
         }
+        if (form.endDate && form.endDate < form.date) {
+            window.showToast('A záró dátum nem lehet korábbi a kezdő dátumnál!', 'warning');
+            return;
+        }
 
         if (form.id !== null) {
             // Update existing event

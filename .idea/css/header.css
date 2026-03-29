@@ -199,6 +199,8 @@
 
 @media (max-width: 768px) {
     .header-center {
-        display: none;
+        flex: 1;
+        max-width: none;
+        margin: 0 var(--spacing-sm);
     }
 }

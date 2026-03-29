@@ -31,6 +31,7 @@ function showToast(message, type = 'info', duration = 3500) {
         <button class="toast-close" aria-label="Bezárás">${Icons.X}</button>
     `;
     const dismiss = () => {
+        if (toast.classList.contains('toast-hiding')) return;
         toast.classList.add('toast-hiding');
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     };
@@ -163,6 +164,7 @@ class TimelineApp {
             saveBtn.replaceWith(saveBtn.cloneNode(true));
             document.getElementById('save-btn').addEventListener('click', () => {
                 this.eventManager.saveEvent();
+                this.closeMobileSidebar();
             });
         }
 
@@ -170,6 +172,7 @@ class TimelineApp {
             deleteBtn.replaceWith(deleteBtn.cloneNode(true));
             document.getElementById('delete-btn').addEventListener('click', () => {
                 this.eventManager.deleteEvent();
+                this.closeMobileSidebar();
             });
         }
 
@@ -177,6 +180,7 @@ class TimelineApp {
             clearBtn.replaceWith(clearBtn.cloneNode(true));
             document.getElementById('clear-btn').addEventListener('click', () => {
                 this.eventManager.clearForm();
+                this.closeMobileSidebar();
             });
         }
     }
@@ -690,7 +694,8 @@ class TimelineApp {
         const url = localStorage.getItem('calendar_script_url');
         if (!url) return;
         const btn = document.getElementById('cloud-save-btn');
-        if (btn) btn.disabled = true;
+        if (btn) { btn.disabled = true; }
+        this.showLoadingOverlay('Mentés a felhőbe…');
         try {
             const payload = JSON.stringify(this.fileHandler.buildPayload(), null, 2);
             await fetch(url, {
@@ -703,6 +708,7 @@ class TimelineApp {
         } catch (e) {
             showToast('Nem sikerült menteni: ' + e.message, 'error', 5000);
         } finally {
+            this.hideLoadingOverlay();
             const b = document.getElementById('cloud-save-btn');
             if (b) b.disabled = false;
         }
