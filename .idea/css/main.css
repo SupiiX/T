@@ -265,6 +265,39 @@ svg {
     display: block;
 }
 
+/* ── Loading overlay ──────────────────────────────── */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+.loading-text {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* ── New semester wizard modal ──────────────────────── */
 .wizard-overlay {
     position: fixed;

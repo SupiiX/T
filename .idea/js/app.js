@@ -599,6 +599,7 @@ class TimelineApp {
             localStorage.setItem('calendar_script_url', url);
             closeModal?.();
             this.rerenderHeader();
+            this.loadFromCloud();
         } catch (e) {
             console.error('Apps Script kapcsolat hiba:', e.name, e.message);
             if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Mentés'; }
@@ -620,11 +621,26 @@ class TimelineApp {
         this.bindSearchEvents();
     }
 
+    showLoadingOverlay(text = 'Adatok betöltése…') {
+        const existing = document.getElementById('loading-overlay');
+        if (existing) return;
+        const el = document.createElement('div');
+        el.id = 'loading-overlay';
+        el.className = 'loading-overlay';
+        el.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">${text}</div>`;
+        document.body.appendChild(el);
+    }
+
+    hideLoadingOverlay() {
+        document.getElementById('loading-overlay')?.remove();
+    }
+
     async loadFromCloud() {
         const url = localStorage.getItem('calendar_script_url');
         if (!url) return;
         const btn = document.getElementById('cloud-load-btn');
         if (btn) btn.disabled = true;
+        this.showLoadingOverlay();
         try {
             const res = await fetch(`${url}?t=${Date.now()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -645,6 +661,7 @@ class TimelineApp {
                 showToast('Betöltési hiba: ' + e.message, 'error', 5000);
             }
         } finally {
+            this.hideLoadingOverlay();
             const b = document.getElementById('cloud-load-btn');
             if (b) b.disabled = false;
         }
