@@ -142,27 +142,35 @@ export class UIManager {
     renderSidebar() {
         const isEditing = this.state.data.form.id !== null;
         const sidebar = document.querySelector('.sidebar');
+        const form = this.state.data.form;
 
         const content = `
-      <h2>${isEditing ? 'Esemény szerkesztése' : 'Új esemény hozzáadása'}</h2>
+      <div class="sidebar-header">
+        <span class="sidebar-badge ${isEditing ? 'badge-edit' : 'badge-new'}">
+          ${isEditing ? 'Szerkesztés' : 'Új esemény'}
+        </span>
+        <h2>${isEditing ? this.escapeHtml(form.title || 'Névtelen esemény') : 'Esemény hozzáadása'}</h2>
+      </div>
 
-      ${this.renderFormFields()}
+      <div class="sidebar-body">
+        ${this.renderFormFields()}
 
-      <div class="form-actions">
-        <button id="save-btn" class="btn btn-primary btn-block">
-          ${Icons.Save}
-          <span>${isEditing ? 'Frissítés' : 'Mentés'}</span>
-        </button>
-        ${isEditing ? `
-          <button id="delete-btn" class="btn btn-danger btn-block">
-            ${Icons.Trash2}
-            <span>Törlés</span>
+        <div class="form-actions">
+          <button id="save-btn" class="btn btn-primary btn-block">
+            ${Icons.Save}
+            <span>${isEditing ? 'Frissítés' : 'Mentés'}</span>
           </button>
-        ` : ''}
-        <button id="clear-btn" class="btn btn-secondary btn-block">
-          ${Icons.FilePlus}
-          <span>Mégse / Új</span>
-        </button>
+          <div class="form-actions-row">
+            ${isEditing ? `
+              <button id="delete-btn" class="btn btn-danger-ghost">
+                ${Icons.Trash2} <span>Törlés</span>
+              </button>
+            ` : ''}
+            <button id="clear-btn" class="btn btn-ghost ${isEditing ? '' : 'btn-block'}">
+              ${Icons.FilePlus} <span>Mégse / Új</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       ${this.renderEventCounter()}
@@ -183,41 +191,47 @@ export class UIManager {
         const form = this.state.data.form;
 
         return `
-      <div class="form-field">
-        <label>Cím</label>
-        <input type="text" id="form-title" value="${this.escapeHtml(form.title)}" placeholder="Esemény neve">
+      <div class="form-section">
+        <p class="section-label">Alapadatok</p>
+        <div class="form-field">
+          <label>Cím</label>
+          <input type="text" id="form-title" value="${this.escapeHtml(form.title)}" placeholder="Esemény neve">
+        </div>
+        ${this.renderCategoryButtons()}
       </div>
 
-      ${this.renderCategoryButtons()}
-
-      <div class="form-field">
-        <label>Kezdés</label>
-        <input type="date" id="form-date" value="${form.date}">
+      <div class="form-section">
+        <p class="section-label">Időpont</p>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Kezdés</label>
+            <input type="date" id="form-date" value="${form.date}">
+          </div>
+          <div class="form-field">
+            <label>Vége</label>
+            <input type="date" id="form-endDate" value="${form.endDate}">
+          </div>
+        </div>
       </div>
 
-      <div class="form-field">
-        <label>Vége (opcionális)</label>
-        <input type="date" id="form-endDate" value="${form.endDate}">
-      </div>
-
-      <div class="form-field">
-        <label>Leírás</label>
-        <input type="text" id="form-description" value="${this.escapeHtml(form.description)}" placeholder="Esemény leírása">
-      </div>
-
-      <div class="form-field">
-        <label>Helyszín</label>
-        <input type="text" id="form-location" value="${this.escapeHtml(form.location)}" placeholder="Esemény helyszíne">
-      </div>
-
-      <div class="form-field">
-        <label>Link</label>
-        <input type="url" id="form-link" value="${this.escapeHtml(form.link)}" placeholder="https://...">
-      </div>
-
-      <div class="form-field form-field-toggle">
-        <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
-        <label for="form-hungarianOnly">Csak magyar</label>
+      <div class="form-section">
+        <p class="section-label">Részletek</p>
+        <div class="form-field">
+          <label>Leírás</label>
+          <input type="text" id="form-description" value="${this.escapeHtml(form.description)}" placeholder="Esemény leírása">
+        </div>
+        <div class="form-field">
+          <label>Helyszín</label>
+          <input type="text" id="form-location" value="${this.escapeHtml(form.location)}" placeholder="Esemény helyszíne">
+        </div>
+        <div class="form-field">
+          <label>Link</label>
+          <input type="url" id="form-link" value="${this.escapeHtml(form.link)}" placeholder="https://...">
+        </div>
+        <div class="form-field form-field-toggle">
+          <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
+          <label for="form-hungarianOnly">Csak magyar</label>
+        </div>
       </div>
 
       ${this.renderBilingualFields()}
@@ -257,9 +271,12 @@ export class UIManager {
         const form = this.state.data.form;
 
         return `
-      <details class="bilingual-fields">
-        <summary>Angol mezők</summary>
-        <div class="bilingual-content">
+      <details class="accordion">
+        <summary class="accordion-summary">
+          <span>Angol mezők</span>
+          <span class="accordion-chevron">${Icons.ChevronDown}</span>
+        </summary>
+        <div class="accordion-body">
           <div class="form-field">
             <label>Title</label>
             <input type="text" id="form-titleEn" value="${this.escapeHtml(form.titleEn)}" placeholder="English title">
@@ -280,9 +297,12 @@ export class UIManager {
     renderSemesterPanel() {
         const sem = this.state.data.semester || {};
         return `
-      <details class="semester-panel">
-        <summary>Félév beállításai</summary>
-        <div class="bilingual-content">
+      <details class="accordion">
+        <summary class="accordion-summary">
+          <span>Félév beállításai</span>
+          <span class="accordion-chevron">${Icons.ChevronDown}</span>
+        </summary>
+        <div class="accordion-body">
           <div class="form-field">
             <label>Azonosító (id)</label>
             <input type="text" id="sem-id" value="${this.escapeHtml(sem.id || '')}" placeholder="pl. 2026-tavasz">
@@ -292,16 +312,18 @@ export class UIManager {
             <input type="text" id="sem-name" value="${this.escapeHtml(sem.name || '')}" placeholder="pl. 2026 Tavaszi félév">
           </div>
           <div class="form-field">
-            <label>Name</label>
+            <label>Name (EN)</label>
             <input type="text" id="sem-nameEn" value="${this.escapeHtml(sem.nameEn || '')}" placeholder="e.g. 2026 Spring Semester">
           </div>
-          <div class="form-field">
-            <label>Kezdete</label>
-            <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
-          </div>
-          <div class="form-field">
-            <label>Vége</label>
-            <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Kezdete</label>
+              <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
+            </div>
+            <div class="form-field">
+              <label>Vége</label>
+              <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
+            </div>
           </div>
         </div>
       </details>
@@ -344,14 +366,19 @@ export class UIManager {
     `).join('');
 
         return `
-      <details class="category-panel">
-        <summary>Kategóriák kezelése</summary>
-        <div id="category-list">
-          ${rows}
+      <details class="accordion">
+        <summary class="accordion-summary">
+          <span>Kategóriák kezelése</span>
+          <span class="accordion-chevron">${Icons.ChevronDown}</span>
+        </summary>
+        <div class="accordion-body">
+          <div id="category-list">
+            ${rows}
+          </div>
+          <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.75rem">
+            + Új kategória
+          </button>
         </div>
-        <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.5rem">
-          + Új kategória
-        </button>
       </details>
     `;
     }
