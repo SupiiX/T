@@ -89,12 +89,17 @@ function doPost(e) {
     var payload = JSON.parse(e.postData.contents);
     var action = payload.action;
 
-    // ── Félév létrehozása ──────────────────────────────────
+    // ── Félév létrehozása / regisztrálása ─────────────────
     if (action === 'create') {
-      var sheet = getOrCreateSheet(payload.sheet);
-      var initData = { semester: payload.meta, events: [], categories: [] };
-      sheet.getRange(1, 1).setValue(JSON.stringify(initData));
-
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var existing = ss.getSheetByName(payload.sheet);
+      if (!existing) {
+        // Csak új sheet esetén inicializáljuk üres adattal
+        var newSheet = ss.insertSheet(payload.sheet);
+        var initData = { semester: payload.meta, events: [], categories: [] };
+        newSheet.getRange(1, 1).setValue(JSON.stringify(initData));
+      }
+      // Mindig frissítjük az _index-et (migration-safe)
       var index = getIndexData();
       index = index.filter(function (s) { return s.sheet !== payload.sheet; });
       index.push(payload.meta);

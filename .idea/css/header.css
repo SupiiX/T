@@ -379,3 +379,70 @@
         margin: 0 var(--spacing-sm);
     }
 }
+
+/* ── Félévek kezelő modal ────────────────────────────── */
+.sem-manager-list {
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.sem-manager-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--color-gray-100);
+    transition: background 0.1s;
+}
+
+.sem-manager-row:last-child {
+    border-bottom: none;
+}
+
+.sem-manager-row:hover {
+    background: var(--color-gray-50);
+}
+
+.sem-row-current {
+    background: color-mix(in srgb, var(--color-primary) 4%, white);
+}
+
+.sem-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.sem-row-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+.sem-row-dates {
+    font-size: 0.72rem;
+    color: var(--color-gray-400);
+}
+
+.sem-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.sem-row-active-label {
+    font-size: 0.72rem;
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.sem-manager-empty {
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--color-gray-400);
+    line-height: 1.6;
+}

@@ -330,6 +330,38 @@ class TimelineApp {
                 });
             }
         });
+        // Félévek kezelő gomb a headerben
+        const smBtn = document.getElementById('semester-manager-btn');
+        if (smBtn) {
+            smBtn.replaceWith(smBtn.cloneNode(true));
+            document.getElementById('semester-manager-btn').addEventListener('click', () => {
+                this.openSemesterManager();
+            });
+        }
+    }
+
+    openSemesterManager() {
+        document.getElementById('semester-manager-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', this.ui.renderSemesterManagerModal());
+
+        const close = () => document.getElementById('semester-manager-modal')?.remove();
+        document.getElementById('sem-manager-close')?.addEventListener('click', close);
+        document.getElementById('sem-manager-close2')?.addEventListener('click', close);
+        document.getElementById('semester-manager-modal')?.addEventListener('click', e => {
+            if (e.target.id === 'semester-manager-modal') close();
+        });
+
+        document.getElementById('sem-manager-new-btn')?.addEventListener('click', () => {
+            close();
+            this.openNewSemesterWizard();
+        });
+
+        document.querySelectorAll('.sem-load-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                close();
+                this.loadSemesterFromCloud(btn.getAttribute('data-sheet'));
+            });
+        });
     }
 
     openNewSemesterWizard() {
@@ -763,7 +795,7 @@ class TimelineApp {
             const res = await fetch(`${url}?action=list&t=${Date.now()}`);
             if (!res.ok) return;
             const list = await res.json();
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 this.state.loadSemesterList(list);
             }
         } catch (e) {
@@ -835,6 +867,22 @@ class TimelineApp {
             this.state.loadData(data);
             const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
             this.state.update('fileName', name + '.json');
+            // ── Auto-migráció: OrarendData regisztrálása _index-be ──
+            const sem = data.semester;
+            if (sem) {
+                const sheetId = 'OrarendData';
+                const meta = {
+                    sheet: sheetId,
+                    name: sem.name || '',
+                    nameEn: sem.nameEn || '',
+                    status: sem.status || 'active',
+                    startDate: sem.startDate || '',
+                    endDate: sem.endDate || ''
+                };
+                this.state.setActiveSemesterSheet(sheetId);
+                this.state.loadSemesterList([meta]);
+                this.createCloudSemester(sheetId, meta); // _index-be írja, sheet nem változik
+            }
             showToast('Sikeresen betöltve a felhőből!', 'success');
         } catch (e) {
             if (e instanceof TypeError) {

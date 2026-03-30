@@ -112,9 +112,9 @@ export class UIManager {
         </div>
         <div class="header-right">
           <div class="header-btn-group">
-            <button id="new-semester-btn" class="btn btn-ghost" aria-label="Új félév létrehozása">
-              ${Icons.FilePlus}
-              <span>Új félév</span>
+            <button id="semester-manager-btn" class="btn btn-ghost" aria-label="Félévek kezelése">
+              ${Icons.CalendarDays}
+              <span>Félévek</span>
             </button>
           </div>
           <div class="header-divider"></div>
@@ -516,6 +516,56 @@ export class UIManager {
         }
       </div>
     `;
+    }
+
+    renderSemesterManagerModal() {
+        const list = this.state.data.semesterList;
+        const current = this.state.data.activeSemesterSheet;
+        const hasCloud = !!localStorage.getItem('calendar_script_url');
+
+        const statusOrder = { active: 0, draft: 1, archived: 2 };
+        const sorted = [...list].sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
+
+        const rows = sorted.length === 0
+            ? `<p class="sem-manager-empty">Még nincs nyilvántartott félév.<br>Hozz létre egyet az alábbi gombbal, vagy töltsd be a felhőből.</p>`
+            : sorted.map(s => `
+              <div class="sem-manager-row ${s.sheet === current ? 'sem-row-current' : ''}">
+                <div class="sem-row-info">
+                  <span class="sem-row-name">${this.escapeHtml(s.name)}</span>
+                  ${s.startDate ? `<span class="sem-row-dates">${s.startDate}${s.endDate ? ' – ' + s.endDate : ''}</span>` : ''}
+                </div>
+                <div class="sem-row-actions">
+                  <span class="status-badge status-${s.status}">${this.statusLabel(s.status)}</span>
+                  ${s.sheet !== current
+                      ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
+                      : `<span class="sem-row-active-label">Aktív szerkesztés</span>`
+                  }
+                </div>
+              </div>`).join('');
+
+        return `
+      <div id="semester-manager-modal" class="wizard-overlay">
+        <div class="wizard-box" style="width:520px">
+          <div class="wizard-header">
+            <h2>Félévek kezelése</h2>
+            <button id="sem-manager-close" class="btn btn-ghost icon-only" style="padding:0.3rem">✕</button>
+          </div>
+          <div class="wizard-body" style="padding:0">
+            <div class="sem-manager-list">${rows}</div>
+          </div>
+          <div class="wizard-footer" style="justify-content:space-between">
+            <div style="font-size:0.75rem;color:var(--color-gray-400)">
+              ${hasCloud ? `${list.length} félév a felhőben` : 'Felhő nincs csatlakoztatva'}
+            </div>
+            <div style="display:flex;gap:0.5rem">
+              <button id="sem-manager-close2" class="btn btn-ghost">Bezár</button>
+              <button id="sem-manager-new-btn" class="btn btn-primary">
+                ${Icons.FilePlus} Új félév
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
     }
 
     renderNewSemesterWizard() {
