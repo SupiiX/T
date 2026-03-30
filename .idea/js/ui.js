@@ -23,7 +23,6 @@ export class UIManager {
                 }
                 break;
             case 'form':
-                // Ha eseményt kattintottak szerkesztésre, váltsunk az Esemény fülre
                 if (data.form.id !== null) {
                     this.activeTab = 'event';
                 }
@@ -43,17 +42,53 @@ export class UIManager {
 
     renderApp() {
         const app = document.getElementById('app');
-        app.innerHTML = '';  // clear first so querySelector finds no stale elements
+        app.innerHTML = '';
+        const isArchived = this.state.data.semester?.status === 'archived';
         app.innerHTML = `
       <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
       <div class="app-container">
         ${this.renderHeader()}
+        ${isArchived ? `
+          <div class="archived-banner">
+            ${Icons.Archive ?? '🗄'} Archivált félév – csak megtekintés, szerkesztés korlátozott
+          </div>` : ''}
         <div class="app-layout">
           ${this.renderSidebar()}
           ${this.renderMainPanel()}
         </div>
       </div>
     `;
+    }
+
+    statusLabel(status) {
+        return { active: 'Aktív', draft: 'Tervezett', archived: 'Archivált' }[status] || status;
+    }
+
+    renderSemesterSwitcher() {
+        const sem = this.state.data.semester;
+        const list = this.state.data.semesterList;
+
+        if (!sem) return `<h1>Naptár Kezelő</h1>`;
+
+        const status = sem.status || 'draft';
+        const badgeHtml = `<span class="status-badge status-${status}">${this.statusLabel(status)}</span>`;
+
+        if (list.length > 0) {
+            return `
+              <div class="semester-switcher">
+                <button class="semester-switcher-btn" id="semester-switcher-btn" aria-label="Félév váltása">
+                  <span class="sem-switcher-name">${this.escapeHtml(sem.name)}</span>
+                  ${badgeHtml}
+                  ${Icons.ChevronDown}
+                </button>
+              </div>`;
+        }
+
+        return `
+          <div class="semester-switcher">
+            <span class="sem-switcher-name">${this.escapeHtml(sem.name)}</span>
+            ${sem.status ? badgeHtml : ''}
+          </div>`;
     }
 
     renderHeader() {
@@ -66,10 +101,7 @@ export class UIManager {
             ${Icons.Menu}
           </button>
           <div class="header-logo">${Icons.CalendarDays}</div>
-          <h1>Naptár Kezelő</h1>
-          <span id="semester-name" class="semester-name">
-            ${this.state.data.semester ? `— ${this.escapeHtml(this.state.data.semester.name)}` : ''}
-          </span>
+          ${this.renderSemesterSwitcher()}
         </div>
         <div class="header-center">
           <div class="header-search-wrapper">
@@ -333,6 +365,7 @@ export class UIManager {
 
     renderSemesterSection() {
         const sem = this.state.data.semester || {};
+        const status = sem.status || 'draft';
         return `
       <div class="settings-section">
         <p class="section-label">Félév</p>
@@ -359,6 +392,14 @@ export class UIManager {
             <label>Vége</label>
             <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
           </div>
+        </div>
+        <div class="form-field">
+          <label>Státusz</label>
+          <select id="sem-status" class="sem-status-select">
+            <option value="draft" ${status === 'draft' ? 'selected' : ''}>Tervezett</option>
+            <option value="active" ${status === 'active' ? 'selected' : ''}>Aktív</option>
+            <option value="archived" ${status === 'archived' ? 'selected' : ''}>Archivált</option>
+          </select>
         </div>
       </div>
     `;

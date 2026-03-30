@@ -57,17 +57,20 @@ class TimelineApp {
         this.ui.renderApp();
         this.bindEvents();
         this.state.subscribe(this.handleStateChange.bind(this));
-        // Close search dropdown on outside click (registered once)
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.header-search-wrapper')) this.closeSearchDropdown();
+            if (!e.target.closest('.semester-switcher')) this.closeSemesterDropdown();
         });
-        // Auto-load from cloud if URL is already configured
         if (localStorage.getItem('calendar_script_url')) {
-            this.loadFromCloud();
+            this.initCloud();
         }
     }
 
     handleStateChange(key, data) {
+        if (key === 'semesterList') {
+            this.rerenderHeader();
+            return;
+        }
         if (key === 'data-loaded' || key === 'events') {
             this.rebindEvents();
             this.switchView(data.currentView);
@@ -99,6 +102,7 @@ class TimelineApp {
         this.bindCloudButtons();
         this.bindSearchEvents();
         this.bindSidebarTabs();
+        this.bindSemesterSwitcher();
     }
 
     rebindEvents() {
@@ -115,6 +119,7 @@ class TimelineApp {
         this.bindCloudButtons();
         this.bindSearchEvents();
         this.bindSidebarTabs();
+        this.bindSemesterSwitcher();
     }
 
     bindSidebarTabs() {
@@ -249,6 +254,15 @@ class TimelineApp {
                 });
             }
         });
+        // Status select – special handling
+        const statusSel = document.getElementById('sem-status');
+        if (statusSel) {
+            const newSel = statusSel.cloneNode(true);
+            statusSel.replaceWith(newSel);
+            newSel.addEventListener('change', (e) => {
+                this.handleSemesterStatusChange(e.target.value);
+            });
+        }
     }
 
     bindCategoryManager() {
@@ -364,12 +378,16 @@ class TimelineApp {
             return;
         }
 
+        const rawId = val('wiz-id') || name;
+        const sheetName = this.sanitizeSheetName(rawId);
+
         const semester = {
-            id: val('wiz-id'),
+            id: sheetName,
             name,
             nameEn: val('wiz-nameEn'),
             startDate: val('wiz-startDate'),
-            endDate: val('wiz-endDate')
+            endDate: val('wiz-endDate'),
+            status: 'draft'
         };
 
         const categories = [];
@@ -387,7 +405,24 @@ class TimelineApp {
         document.getElementById('semester-wizard')?.remove();
 
         this.state.loadData({ semester, categories, events: [] });
+        this.state.setActiveSemesterSheet(sheetName);
         this.state.update('fileName', name.replace(/\s+/g, '_') + '.json');
+
+        // If cloud is connected, create the sheet there too
+        if (localStorage.getItem('calendar_script_url')) {
+            this.createCloudSemester(sheetName, {
+                sheet: sheetName,
+                name: semester.name,
+                nameEn: semester.nameEn || '',
+                status: 'draft',
+                startDate: semester.startDate || '',
+                endDate: semester.endDate || ''
+            });
+        }
+    }
+
+    sanitizeSheetName(name) {
+        return name.replace(/[\\/?*[\]:]/g, '-').substring(0, 100).trim();
     }
 
     bindMobileToggle() {
@@ -630,6 +665,67 @@ class TimelineApp {
         this.bindNewSemesterBtn();
         this.bindCloudButtons();
         this.bindSearchEvents();
+        this.bindSemesterSwitcher();
+    }
+
+    bindSemesterSwitcher() {
+        const btn = document.getElementById('semester-switcher-btn');
+        if (btn) {
+            btn.replaceWith(btn.cloneNode(true));
+            document.getElementById('semester-switcher-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleSemesterDropdown();
+            });
+        }
+    }
+
+    toggleSemesterDropdown() {
+        const existing = document.getElementById('semester-dropdown');
+        if (existing) { existing.remove(); return; }
+
+        const switcher = document.querySelector('.semester-switcher');
+        if (!switcher) return;
+
+        const list = this.state.data.semesterList;
+        if (!list.length) return;
+
+        const active = list.filter(s => s.status === 'active');
+        const drafts = list.filter(s => s.status === 'draft');
+        const archived = list.filter(s => s.status === 'archived');
+
+        const renderItem = (s) => {
+            const isCurrent = s.sheet === this.state.data.activeSemesterSheet;
+            return `
+              <div class="semester-dropdown-item ${isCurrent ? 'current' : ''}" data-sheet="${s.sheet}">
+                <span class="sem-drop-name">${this.ui.escapeHtml(s.name)}</span>
+                <span class="status-badge status-${s.status}">${this.ui.statusLabel(s.status)}</span>
+              </div>`;
+        };
+
+        const dropdown = document.createElement('div');
+        dropdown.id = 'semester-dropdown';
+        dropdown.className = 'semester-dropdown';
+        dropdown.innerHTML = [
+            ...active.map(renderItem),
+            ...drafts.map(renderItem),
+            archived.length ? `<div class="semester-dropdown-divider">Archivált</div>` + archived.map(renderItem).join('') : ''
+        ].join('');
+
+        switcher.appendChild(dropdown);
+
+        dropdown.querySelectorAll('.semester-dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sheet = item.getAttribute('data-sheet');
+                this.closeSemesterDropdown();
+                if (sheet !== this.state.data.activeSemesterSheet) {
+                    this.loadSemesterFromCloud(sheet);
+                }
+            });
+        });
+    }
+
+    closeSemesterDropdown() {
+        document.getElementById('semester-dropdown')?.remove();
     }
 
     showLoadingOverlay(text = 'Adatok betöltése…') {
@@ -646,31 +742,65 @@ class TimelineApp {
         document.getElementById('loading-overlay')?.remove();
     }
 
-    async loadFromCloud() {
+    // ── Cloud inicializálás induláskor ─────────────────────
+    async initCloud() {
+        await this.loadSemesterList();
+        const list = this.state.data.semesterList;
+        const active = list.find(s => s.status === 'active');
+        if (active) {
+            await this.loadSemesterFromCloud(active.sheet, true);
+        } else {
+            // Backward compat: régi formátum, nincs _index
+            await this.loadFromCloud(true);
+        }
+    }
+
+    // ── Félév lista betöltése ──────────────────────────────
+    async loadSemesterList() {
         const url = localStorage.getItem('calendar_script_url');
         if (!url) return;
-        if (this.state.data.events.length > 0) {
-            if (!confirm('A felhőből való betöltés felülírja a jelenlegi adatokat. Biztosan folytatod?')) return;
+        try {
+            const res = await fetch(`${url}?action=list&t=${Date.now()}`);
+            if (!res.ok) return;
+            const list = await res.json();
+            if (Array.isArray(list) && list.length > 0) {
+                this.state.loadSemesterList(list);
+            }
+        } catch (e) {
+            console.warn('Semester list load failed:', e);
+        }
+    }
+
+    // ── Adott félév betöltése a felhőből ──────────────────
+    async loadSemesterFromCloud(sheetName, skipConfirm = false) {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) return;
+        if (!skipConfirm && this.state.data.events.length > 0) {
+            if (!confirm('A betöltés felülírja a jelenlegi adatokat. Biztosan folytatod?')) return;
         }
         const btn = document.getElementById('cloud-load-btn');
         if (btn) btn.disabled = true;
-        this.showLoadingOverlay();
+        this.showLoadingOverlay('Félév betöltése…');
         try {
-            const res = await fetch(`${url}?t=${Date.now()}`);
+            const res = await fetch(`${url}?action=load&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const text = await res.text();
             if (!text || text.trim() === '{}') {
-                showToast('A felhőben még nincs mentett adat.', 'info');
+                showToast('Ez a félév még üres.', 'info');
                 return;
             }
             const data = JSON.parse(text);
+            // Status injektálása az _index-ből
+            const meta = this.state.data.semesterList.find(s => s.sheet === sheetName);
+            if (meta && data.semester) data.semester.status = meta.status;
             this.state.loadData(data);
-            const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
+            this.state.setActiveSemesterSheet(sheetName);
+            const name = data.semester?.name?.replace(/\s+/g, '_') || sheetName;
             this.state.update('fileName', name + '.json');
-            showToast('Sikeresen betöltve a felhőből!', 'success');
+            showToast(`Betöltve: ${data.semester?.name || sheetName}`, 'success');
         } catch (e) {
             if (e instanceof TypeError) {
-                showToast('Nem sikerült csatlakozni a felhőhöz. Ellenőrizd az URL-t és az internet kapcsolatot!', 'error', 6000);
+                showToast('Nem sikerült csatlakozni a felhőhöz!', 'error', 6000);
             } else {
                 showToast('Betöltési hiba: ' + e.message, 'error', 5000);
             }
@@ -681,19 +811,74 @@ class TimelineApp {
         }
     }
 
+    // ── Betöltés gomb (kézi) – az aktív félév újratöltése ─
+    async loadFromCloud(skipConfirm = false) {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) return;
+        const sheetName = this.state.data.activeSemesterSheet;
+        if (sheetName) {
+            return this.loadSemesterFromCloud(sheetName, skipConfirm);
+        }
+        // Backward compat: nincs activeSemesterSheet (régi formátum)
+        if (!skipConfirm && this.state.data.events.length > 0) {
+            if (!confirm('A felhőből való betöltés felülírja a jelenlegi adatokat. Biztosan folytatod?')) return;
+        }
+        const btn = document.getElementById('cloud-load-btn');
+        if (btn) btn.disabled = true;
+        this.showLoadingOverlay();
+        try {
+            const res = await fetch(`${url}?t=${Date.now()}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const text = await res.text();
+            if (!text || text.trim() === '{}') { showToast('A felhőben még nincs mentett adat.', 'info'); return; }
+            const data = JSON.parse(text);
+            this.state.loadData(data);
+            const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
+            this.state.update('fileName', name + '.json');
+            showToast('Sikeresen betöltve a felhőből!', 'success');
+        } catch (e) {
+            if (e instanceof TypeError) {
+                showToast('Nem sikerült csatlakozni a felhőhöz!', 'error', 6000);
+            } else {
+                showToast('Betöltési hiba: ' + e.message, 'error', 5000);
+            }
+        } finally {
+            this.hideLoadingOverlay();
+            const b = document.getElementById('cloud-load-btn');
+            if (b) b.disabled = false;
+        }
+    }
+
+    // ── Mentés a felhőbe ───────────────────────────────────
     async saveToCloud() {
         const url = localStorage.getItem('calendar_script_url');
         if (!url) return;
         const btn = document.getElementById('cloud-save-btn');
-        if (btn) { btn.disabled = true; }
+        if (btn) btn.disabled = true;
         this.showLoadingOverlay('Mentés a felhőbe…');
         try {
-            const payload = JSON.stringify(this.fileHandler.buildPayload(), null, 2);
+            const payloadData = JSON.stringify(this.fileHandler.buildPayload(), null, 2);
+            const sheetName = this.state.data.activeSemesterSheet;
+            const sem = this.state.data.semester;
+            const body = sheetName
+                ? JSON.stringify({
+                    action: 'save',
+                    sheet: sheetName,
+                    data: payloadData,
+                    meta: sem ? {
+                        name: sem.name || '',
+                        nameEn: sem.nameEn || '',
+                        status: sem.status || 'draft',
+                        startDate: sem.startDate || '',
+                        endDate: sem.endDate || ''
+                    } : undefined
+                  })
+                : payloadData; // legacy fallback
             await fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
-                body: payload
+                body
             });
             showToast('Mentve a felhőbe!', 'success');
         } catch (e) {
@@ -702,6 +887,54 @@ class TimelineApp {
             this.hideLoadingOverlay();
             const b = document.getElementById('cloud-save-btn');
             if (b) b.disabled = false;
+        }
+    }
+
+    // ── Új félév létrehozása a felhőben ────────────────────
+    async createCloudSemester(sheetName, meta) {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) return;
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ action: 'create', sheet: sheetName, meta })
+            });
+            // Frissítjük a lokális listát
+            const updated = [...this.state.data.semesterList.filter(s => s.sheet !== sheetName), meta];
+            this.state.loadSemesterList(updated);
+        } catch (e) {
+            console.warn('Cloud semester create failed:', e);
+        }
+    }
+
+    // ── Státusz változtatás ────────────────────────────────
+    async handleSemesterStatusChange(newStatus) {
+        const sheetName = this.state.data.activeSemesterSheet;
+        this.state.updateSemester({ status: newStatus });
+
+        if (!localStorage.getItem('calendar_script_url') || !sheetName) return;
+
+        // Lokális lista frissítése
+        const list = this.state.data.semesterList.map(s => {
+            if (newStatus === 'active' && s.status === 'active') return { ...s, status: 'archived' };
+            if (s.sheet === sheetName) return { ...s, status: newStatus };
+            return s;
+        });
+        this.state.loadSemesterList(list);
+
+        // Felhő frissítése
+        const url = localStorage.getItem('calendar_script_url');
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ action: 'setStatus', sheet: sheetName, status: newStatus })
+            });
+        } catch (e) {
+            console.warn('setStatus cloud sync failed:', e);
         }
     }
 }

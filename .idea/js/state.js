@@ -6,6 +6,8 @@ export class AppState {
             events: [],
             categories: [],
             semester: null,
+            semesterList: [],       // [{ sheet, name, nameEn, status, startDate, endDate }]
+            activeSemesterSheet: null,  // active sheet name in Google Sheets
             form: this.getEmptyForm(),
             fileName: '',
             currentView: 'calendar'
@@ -125,5 +127,16 @@ export class AppState {
     resetForm() {
         this.data.form = this.getEmptyForm();
         this.notify('form');
+    }
+
+    // Load semester list from cloud index
+    loadSemesterList(list) {
+        this.data.semesterList = list || [];
+        this.notify('semesterList');
+    }
+
+    // Set which sheet is currently loaded
+    setActiveSemesterSheet(sheet) {
+        this.data.activeSemesterSheet = sheet;
     }
 }
