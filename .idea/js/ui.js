@@ -18,7 +18,8 @@ export class UIManager {
             case 'events':
                 this.updateEventCounter();
                 this.updateDownloadButton();
-                if (data.events.length === 0) {
+                // Empty state → első esemény hozzáadásakor váltson naptár nézetre
+                if (data.events.length === 0 || document.querySelector('.empty-state')) {
                     this.renderMainPanel();
                 }
                 break;
@@ -618,9 +619,16 @@ export class UIManager {
 
     // Partial updates
     updateSemesterHeader() {
-        const el = document.getElementById('semester-name');
-        if (el && this.state.data.semester) {
-            el.textContent = `— ${this.state.data.semester.name || ''}`;
+        const sem = this.state.data.semester;
+        if (!sem) return;
+        // Név frissítése a switcher gombban
+        const nameEl = document.querySelector('.sem-switcher-name');
+        if (nameEl) nameEl.textContent = sem.name || '';
+        // Státusz badge frissítése
+        const badge = document.querySelector('.semester-switcher .status-badge');
+        if (badge) {
+            badge.className = `status-badge status-${sem.status || 'draft'}`;
+            badge.textContent = this.statusLabel(sem.status || 'draft');
         }
     }
 

@@ -71,6 +71,10 @@ class TimelineApp {
             this.rerenderHeader();
             return;
         }
+        if (key === 'semester') {
+            this.updateArchivedBanner();
+            return;
+        }
         if (key === 'data-loaded' || key === 'events') {
             this.rebindEvents();
             this.switchView(data.currentView);
@@ -698,6 +702,21 @@ class TimelineApp {
         this.bindCloudButtons();
         this.bindSearchEvents();
         this.bindSemesterSwitcher();
+    }
+
+    updateArchivedBanner() {
+        // Fejléc alatti figyelmeztető sáv kezelése
+        this.ui.updateSemesterHeader();
+        const isArchived = this.state.data.semester?.status === 'archived';
+        const existing = document.querySelector('.archived-banner');
+        if (isArchived && !existing) {
+            const header = document.querySelector('.app-header');
+            header?.insertAdjacentHTML('afterend',
+                `<div class="archived-banner">${Icons.Archive} Archivált félév – csak megtekintés, szerkesztés korlátozott</div>`
+            );
+        } else if (!isArchived && existing) {
+            existing.remove();
+        }
     }
 
     bindSemesterSwitcher() {
