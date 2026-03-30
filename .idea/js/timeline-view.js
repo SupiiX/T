@@ -50,9 +50,12 @@ export class TimelineView {
                 ${ev.endDate && ev.endDate !== ev.date ? ` — ${formatDateShort(ev.endDate)}` : ''}
               </p>
             </div>
-            <span class="timeline-category-badge" style="background-color: ${color}">
-              ${this.escapeHtml(cat?.name || ev.category)}
-            </span>
+            <div class="timeline-card-badges">
+              ${isActive ? `<span class="timeline-edit-indicator">✎ Szerkesztés</span>` : ''}
+              <span class="timeline-category-badge">
+                ${this.escapeHtml(cat?.name || ev.category)}
+              </span>
+            </div>
           </div>
           ${this.renderEventDetails(ev)}
         </div>
