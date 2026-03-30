@@ -220,17 +220,16 @@ export class UIManager {
         const form = this.state.data.form;
 
         return `
-      <div class="form-section">
-        <p class="section-label">Alapadatok</p>
+      <div class="event-form">
         <div class="form-field">
           <label>Cím</label>
           <input type="text" id="form-title" value="${this.escapeHtml(form.title)}" placeholder="Esemény neve">
         </div>
-        ${this.renderCategoryButtons()}
-      </div>
 
-      <div class="form-section">
-        <p class="section-label">Időpont</p>
+        ${this.renderCategoryButtons()}
+
+        <div class="form-divider"></div>
+
         <div class="form-row">
           <div class="form-field">
             <label>Kezdés</label>
@@ -241,25 +240,28 @@ export class UIManager {
             <input type="date" id="form-endDate" value="${form.endDate}">
           </div>
         </div>
-      </div>
 
-      <div class="form-section">
-        <p class="section-label">Részletek</p>
+        <div class="form-divider"></div>
+
         <div class="form-field">
           <label>Leírás</label>
-          <input type="text" id="form-description" value="${this.escapeHtml(form.description)}" placeholder="Esemény leírása">
+          <input type="text" id="form-description" value="${this.escapeHtml(form.description)}" placeholder="Rövid leírás">
         </div>
         <div class="form-field">
           <label>Helyszín</label>
-          <input type="text" id="form-location" value="${this.escapeHtml(form.location)}" placeholder="Esemény helyszíne">
+          <input type="text" id="form-location" value="${this.escapeHtml(form.location)}" placeholder="Terem, épület…">
         </div>
         <div class="form-field">
           <label>Link</label>
-          <input type="url" id="form-link" value="${this.escapeHtml(form.link)}" placeholder="https://...">
+          <input type="url" id="form-link" value="${this.escapeHtml(form.link)}" placeholder="https://…">
         </div>
-        <div class="form-field form-field-toggle">
-          <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
-          <label for="form-hungarianOnly">Csak magyar</label>
+
+        <div class="toggle-field">
+          <label class="toggle-switch">
+            <input type="checkbox" id="form-hungarianOnly" ${form.hungarianOnly ? 'checked' : ''}>
+            <span class="toggle-track"></span>
+          </label>
+          <span class="toggle-label-text">Csak magyar oldal</span>
         </div>
       </div>
 
