@@ -455,29 +455,6 @@
     flex: 1;
 }
 
-/* ── Ghost buttons ──────────────────────────────────── */
-.btn-ghost {
-    background: transparent;
-    color: var(--color-gray-600);
-    border: 1px solid var(--color-gray-200);
-}
-
-.btn-ghost:hover:not(:disabled) {
-    background: var(--color-gray-50);
-    color: var(--color-gray-900);
-    border-color: var(--color-gray-300);
-}
-
-.btn-danger-ghost {
-    background: transparent;
-    color: var(--color-danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.btn-danger-ghost:hover:not(:disabled) {
-    background: #fef2f2;
-    border-color: var(--color-danger);
-}
 
 /* ── Event counter ──────────────────────────────────── */
 .event-counter {

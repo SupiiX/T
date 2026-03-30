@@ -38,7 +38,21 @@
 .header-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 0.5rem;
+}
+
+.header-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.header-divider {
+    width: 1px;
+    height: 1.25rem;
+    background: var(--color-gray-200);
+    flex-shrink: 0;
+    margin: 0 0.125rem;
 }
 
 .file-name {
@@ -72,11 +86,15 @@
     }
 
     .header-right {
-        gap: var(--spacing-sm);
+        gap: 0.25rem;
     }
 
     .header-left {
         gap: var(--spacing-sm);
+    }
+
+    .header-divider {
+        display: none;
     }
 }
 

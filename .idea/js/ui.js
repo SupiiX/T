@@ -58,10 +58,11 @@ export class UIManager {
 
     renderHeader() {
         const hasCloud = !!localStorage.getItem('calendar_script_url');
+        const hasEvents = this.state.data.events.length > 0;
         return `
       <header class="app-header">
         <div class="header-left">
-          <button id="mobile-sidebar-btn" class="btn btn-secondary mobile-only" aria-label="Form megnyitása">
+          <button id="mobile-sidebar-btn" class="btn btn-ghost icon-only mobile-only" aria-label="Form megnyitása">
             ${Icons.Menu}
           </button>
           <div class="header-logo">${Icons.CalendarDays}</div>
@@ -78,36 +79,39 @@ export class UIManager {
           </div>
         </div>
         <div class="header-right">
-          <button id="new-semester-btn" class="btn btn-secondary">
-            ${Icons.FilePlus}
-            <span>Új félév</span>
-          </button>
+          <div class="header-btn-group">
+            <button id="new-semester-btn" class="btn btn-ghost" aria-label="Új félév létrehozása">
+              ${Icons.FilePlus}
+              <span>Új félév</span>
+            </button>
+          </div>
+          <div class="header-divider"></div>
+          <div class="header-btn-group">
+            <button id="upload-btn" class="btn btn-ghost icon-only" aria-label="JSON fájl betöltése" title="JSON fájl betöltése">
+              ${Icons.Upload}
+            </button>
+            <button id="download-btn" class="btn btn-ghost icon-only" aria-label="JSON letöltése" title="JSON letöltése" ${!hasEvents ? 'disabled' : ''}>
+              ${Icons.Download}
+            </button>
+          </div>
+          <div class="header-divider"></div>
           ${hasCloud ? `
-          <button id="cloud-load-btn" class="btn btn-secondary">
-            ${Icons.CloudDownload} <span>Betöltés</span>
-          </button>
-          <button id="cloud-save-btn" class="btn btn-secondary">
-            ${Icons.CloudUpload} <span>Mentés</span>
-          </button>
-          <button id="cloud-settings-btn" class="btn btn-secondary icon-only" aria-label="Felhő beállítása">
-            ${Icons.Settings}
-          </button>
+          <div class="header-btn-group">
+            <button id="cloud-settings-btn" class="btn btn-ghost icon-only" aria-label="Felhő beállítása" title="Felhő beállítása">
+              ${Icons.Settings}
+            </button>
+            <button id="cloud-load-btn" class="btn btn-ghost" aria-label="Betöltés felhőből">
+              ${Icons.CloudDownload} <span>Betöltés</span>
+            </button>
+            <button id="cloud-save-btn" class="btn btn-primary" aria-label="Mentés felhőbe">
+              ${Icons.CloudUpload} <span>Mentés</span>
+            </button>
+          </div>
           ` : `
-          <button id="cloud-settings-btn" class="btn btn-secondary">
-            ${Icons.Cloud} <span>Felhő beállítása</span>
+          <button id="cloud-settings-btn" class="btn btn-ghost" aria-label="Felhő csatlakoztatása">
+            ${Icons.Cloud} <span>Felhő csatlakoztatása</span>
           </button>
           `}
-          <button id="upload-btn" class="btn btn-primary">
-            ${Icons.Upload}
-            <span>JSON Betöltés</span>
-          </button>
-          <button id="download-btn" class="btn btn-success" ${this.state.data.events.length === 0 ? 'disabled' : ''}>
-            ${Icons.Download}
-            <span>JSON Letöltés</span>
-          </button>
-          <span id="file-name" class="file-name">
-            ${this.state.data.fileName ? `Betöltve: ${this.escapeHtml(this.state.data.fileName)}` : ''}
-          </span>
         </div>
       </header>
     `;
