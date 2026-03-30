@@ -80,7 +80,7 @@ export class TimelineView {
     }
 
     handleEventClick(ev) {
-        this.state.data.form = {
+        this.state.updateForm({
             id: ev.id,
             title: ev.title,
             titleEn: ev.titleEn || '',
@@ -93,8 +93,7 @@ export class TimelineView {
             locationEn: ev.locationEn || '',
             link: ev.link || '',
             hungarianOnly: ev.hungarianOnly || false
-        };
-        this.state.notify('form');
+        });
     }
 
     escapeHtml(text) {

@@ -33,7 +33,7 @@ export class UIManager {
                 this.renderApp();
                 break;
             case 'fileName':
-                this.updateFileName();
+                // file-name elem nincs a headerben, toast kezeli
                 break;
             case 'semester':
                 this.updateSemesterHeader();
@@ -636,13 +636,6 @@ export class UIManager {
         const counter = document.querySelector('.event-counter');
         if (counter) {
             counter.outerHTML = this.renderEventCounter();
-        }
-    }
-
-    updateFileName() {
-        const fileNameEl = document.getElementById('file-name');
-        if (fileNameEl) {
-            fileNameEl.textContent = this.state.data.fileName ? `Betöltve: ${this.escapeHtml(this.state.data.fileName)}` : '';
         }
     }
 

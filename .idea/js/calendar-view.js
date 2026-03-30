@@ -67,7 +67,7 @@ export class CalendarView {
         const original = this.state.data.events.find(e => e.id === Number(ev.id));
 
         if (original) {
-            this.state.data.form = {
+            this.state.updateForm({
                 id: original.id,
                 title: original.title,
                 titleEn: original.titleEn || '',
@@ -80,17 +80,15 @@ export class CalendarView {
                 locationEn: original.locationEn || '',
                 link: original.link || '',
                 hungarianOnly: original.hungarianOnly || false
-            };
-            this.state.notify('form');
+            });
         }
     }
 
     handleDateClick(info) {
-        this.state.data.form = {
+        this.state.updateForm({
             ...this.state.getEmptyForm(),
             date: info.dateStr
-        };
-        this.state.notify('form');
+        });
     }
 
     handleEventDrop(info) {

@@ -75,6 +75,11 @@ class TimelineApp {
             this.updateArchivedBanner();
             return;
         }
+        if (key === 'categories') {
+            this.ui.renderSidebar();
+            this.rebindEvents();
+            return;
+        }
         if (key === 'data-loaded' || key === 'events') {
             this.rebindEvents();
             this.switchView(data.currentView);
@@ -271,7 +276,7 @@ class TimelineApp {
 
     bindCategoryManager() {
         // Bind inline edit inputs on each category row (update on input, no re-render)
-        document.querySelectorAll('.category-row').forEach(row => {
+        document.querySelectorAll('.cat-card').forEach(row => {
             const catId = row.getAttribute('data-cat-id');
 
             const bindField = (selector, stateKey, isCheckbox = false) => {
@@ -325,7 +330,7 @@ class TimelineApp {
     }
 
     bindNewSemesterBtn() {
-        ['new-semester-btn', 'new-semester-btn-empty'].forEach(id => {
+        ['new-semester-btn-empty'].forEach(id => {
             const btn = document.getElementById(id);
             if (btn) {
                 btn.replaceWith(btn.cloneNode(true));
@@ -795,14 +800,18 @@ class TimelineApp {
 
     // ── Cloud inicializálás induláskor ─────────────────────
     async initCloud() {
-        await this.loadSemesterList();
-        const list = this.state.data.semesterList;
-        const active = list.find(s => s.status === 'active');
-        if (active) {
-            await this.loadSemesterFromCloud(active.sheet, true);
-        } else {
-            // Backward compat: régi formátum, nincs _index
-            await this.loadFromCloud(true);
+        try {
+            await this.loadSemesterList();
+            const list = this.state.data.semesterList;
+            const active = list.find(s => s.status === 'active');
+            if (active) {
+                await this.loadSemesterFromCloud(active.sheet, true);
+            } else {
+                await this.loadFromCloud(true);
+            }
+        } catch (e) {
+            console.warn('Cloud init failed:', e);
+            showToast('Nem sikerült csatlakozni a felhőhöz az induláskor.', 'warning', 4000);
         }
     }
 
@@ -841,9 +850,9 @@ class TimelineApp {
                 return;
             }
             const data = JSON.parse(text);
-            // Status injektálása az _index-ből
+            // Status injektálása az _index-ből (fallback: draft)
             const meta = this.state.data.semesterList.find(s => s.sheet === sheetName);
-            if (meta && data.semester) data.semester.status = meta.status;
+            if (data.semester) data.semester.status = meta?.status || 'draft';
             this.state.loadData(data);
             this.state.setActiveSemesterSheet(sheetName);
             const name = data.semester?.name?.replace(/\s+/g, '_') || sheetName;

@@ -31,6 +31,12 @@ export class AppState {
         this.notify(key);
     }
 
+    // Replace the entire form object and notify (use instead of direct mutation)
+    updateForm(formData) {
+        this.data.form = formData;
+        this.notify('form');
+    }
+
     // Update a single form field (silent – no re-render needed for keystrokes)
     updateFormField(field, value) {
         this.data.form[field] = value;
