@@ -390,6 +390,11 @@ class TimelineApp {
             if (e.target.id === 'semester-wizard') close();
         });
 
+        // Bind delete buttons on pre-populated rows (inherited from current semester)
+        document.querySelectorAll('#wizard-cat-list .btn-del-cat').forEach(btn => {
+            btn.addEventListener('click', () => btn.closest('.wizard-cat-row')?.remove());
+        });
+
         // Add category row
         document.getElementById('wizard-add-cat-btn')?.addEventListener('click', () => {
             const list = document.getElementById('wizard-cat-list');

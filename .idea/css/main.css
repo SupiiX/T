@@ -389,6 +389,23 @@ svg {
     flex-shrink: 0;
 }
 
+.wizard-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+}
+
+.wizard-cat-header:first-child {
+    margin-top: 0;
+}
+
+.wizard-cat-note {
+    font-size: 0.75rem;
+    color: var(--color-gray-500);
+    font-style: italic;
+}
+
 .wizard-cat-row {
     display: flex;
     align-items: center;
