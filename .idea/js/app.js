@@ -390,6 +390,37 @@ class TimelineApp {
             if (e.target.id === 'semester-wizard') close();
         });
 
+        // ── Év/félév picker ───────────────────────────────────
+        const picker = document.querySelector('.wiz-sem-picker');
+        if (picker) {
+            const updatePicker = () => {
+                const year   = parseInt(picker.dataset.year);
+                const minYear= parseInt(picker.dataset.minYear);
+                const sem    = parseInt(picker.dataset.sem);
+                const shortEnd = String(year + 1).slice(-2);
+                picker.querySelector('.wiz-year-label').textContent = `${year}/${shortEnd}`;
+                picker.querySelector('.wiz-name-code').textContent  = `${year}/${shortEnd}/${sem}`;
+                picker.querySelector('.wiz-year-dec').disabled = year <= minYear;
+            };
+
+            picker.querySelector('.wiz-year-dec')?.addEventListener('click', () => {
+                picker.dataset.year = parseInt(picker.dataset.year) - 1;
+                updatePicker();
+            });
+            picker.querySelector('.wiz-year-inc')?.addEventListener('click', () => {
+                picker.dataset.year = parseInt(picker.dataset.year) + 1;
+                updatePicker();
+            });
+            picker.querySelectorAll('.wiz-sem-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    picker.querySelectorAll('.wiz-sem-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    picker.dataset.sem = btn.dataset.sem;
+                    updatePicker();
+                });
+            });
+        }
+
         // Bind delete buttons on pre-populated rows (inherited from current semester)
         document.querySelectorAll('#wizard-cat-list .btn-del-cat').forEach(btn => {
             btn.addEventListener('click', () => btn.closest('.wizard-cat-row')?.remove());
@@ -416,23 +447,32 @@ class TimelineApp {
     }
 
     createSemesterFromWizard() {
-        const val = id => document.getElementById(id)?.value.trim() || '';
-        const name = val('wiz-name');
+        const picker = document.querySelector('.wiz-sem-picker');
+        if (!picker) { showToast('Hiba: félév kiválasztó nem található.', 'error'); return; }
 
-        if (!name) {
-            showToast('Kérlek add meg a félév nevét!', 'warning');
+        const year     = parseInt(picker.dataset.year);
+        const sem      = parseInt(picker.dataset.sem);
+        const shortEnd = String(year + 1).slice(-2);
+
+        // Generált nevek és sheet azonosító
+        const name      = `${year}/${shortEnd}/${sem}`;          // pl. "2025/26/1"
+        const nameEn    = `${year}/${shortEnd} Semester ${sem}`; // pl. "2025/26 Semester 1"
+        const sheetName = `${year}-${shortEnd}-${sem}`;          // pl. "2025-26-1"
+
+        // Duplikátum ellenőrzés
+        const alreadyExists = this.state.data.semesterList.some(s => s.sheet === sheetName);
+        if (alreadyExists) {
+            showToast(`A(z) ${name} félév már létezik!`, 'warning');
             return;
         }
 
-        const rawId = val('wiz-id') || name;
-        const sheetName = this.sanitizeSheetName(rawId);
-
+        const val = id => document.getElementById(id)?.value.trim() || '';
         const semester = {
             id: sheetName,
             name,
-            nameEn: val('wiz-nameEn'),
+            nameEn,
             startDate: val('wiz-startDate'),
-            endDate: val('wiz-endDate'),
+            endDate:   val('wiz-endDate'),
             status: 'draft'
         };
 
@@ -441,10 +481,10 @@ class TimelineApp {
             const catName = row.querySelector('.wiz-cat-name')?.value.trim();
             if (!catName) return;
             categories.push({
-                id: String(i + 1),
-                name: catName,
+                id:     String(i + 1),
+                name:   catName,
                 nameEn: row.querySelector('.wiz-cat-nameEn')?.value.trim() || '',
-                color: row.querySelector('.wiz-cat-color')?.value || '#6366f1'
+                color:  row.querySelector('.wiz-cat-color')?.value || '#6366f1'
             });
         });
 
@@ -452,17 +492,16 @@ class TimelineApp {
 
         this.state.loadData({ semester, categories, events: [] });
         this.state.setActiveSemesterSheet(sheetName);
-        this.state.update('fileName', name.replace(/\s+/g, '_') + '.json');
+        this.state.update('fileName', sheetName + '.json');
 
-        // If cloud is connected, create the sheet there too
         if (localStorage.getItem('calendar_script_url')) {
             this.createCloudSemester(sheetName, {
                 sheet: sheetName,
-                name: semester.name,
-                nameEn: semester.nameEn || '',
-                status: 'draft',
+                name,
+                nameEn,
+                status:    'draft',
                 startDate: semester.startDate || '',
-                endDate: semester.endDate || ''
+                endDate:   semester.endDate   || ''
             });
         }
     }

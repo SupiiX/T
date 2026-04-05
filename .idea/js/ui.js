@@ -570,6 +570,12 @@ export class UIManager {
     }
 
     renderNewSemesterWizard() {
+        // Magyar tanév: szeptembertől kezdődik (hónap index 8)
+        const now = new Date();
+        const minYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+        const shortEnd = String(minYear + 1).slice(-2);
+        const defaultName = `${minYear}/${shortEnd}/1`;
+
         return `
       <div id="semester-wizard" class="wizard-overlay">
         <div class="wizard-box">
@@ -578,20 +584,22 @@ export class UIManager {
             <button id="wizard-close-btn" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
           </div>
           <div class="wizard-body">
-            <p class="wizard-section-title">Félév adatai</p>
-            <div class="form-field">
-              <label>Azonosító (id)</label>
-              <input type="text" id="wiz-id" placeholder="pl. 2024-25-2">
+            <p class="wizard-section-title">Félév kiválasztása</p>
+            <div class="wiz-sem-picker" data-min-year="${minYear}" data-year="${minYear}" data-sem="1">
+              <div class="wiz-year-row">
+                <button class="btn btn-ghost icon-only wiz-year-dec" disabled aria-label="Előző tanév">−</button>
+                <span class="wiz-year-label">${minYear}/${shortEnd}</span>
+                <button class="btn btn-ghost icon-only wiz-year-inc" aria-label="Következő tanév">+</button>
+              </div>
+              <div class="wiz-sem-toggle">
+                <button class="wiz-sem-btn active" data-sem="1">1. félév</button>
+                <button class="wiz-sem-btn" data-sem="2">2. félév</button>
+              </div>
+              <div class="wiz-name-preview">
+                Azonosító: <code class="wiz-name-code">${defaultName}</code>
+              </div>
             </div>
-            <div class="form-field">
-              <label>Magyar neve</label>
-              <input type="text" id="wiz-name" placeholder="pl. 2024/25 tavaszi félév">
-            </div>
-            <div class="form-field">
-              <label>Angol neve (nameEn)</label>
-              <input type="text" id="wiz-nameEn" placeholder="e.g. Spring semester 2024/25">
-            </div>
-            <div class="form-field">
+            <div class="form-field" style="margin-top:var(--spacing-md)">
               <label>Kezdő dátum</label>
               <input type="date" id="wiz-startDate">
             </div>
