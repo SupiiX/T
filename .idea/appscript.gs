@@ -122,12 +122,18 @@ function writeRows(sheet, headers, items) {
     return headers.map(function (h) {
       var v = item[h];
       if (v === undefined || v === null) return '';
-      if (typeof v === 'boolean') return v;
+      // Boolean → 'TRUE'/'FALSE' string, hogy a Sheets ne konvertálja máshogy
+      if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
       return String(v);
     });
   });
 
-  sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  // Fontos: '@' (plain text) formátum ELŐBB, hogy a Sheets ne konvertálja
+  // az ID-kat és category referenciákat számokká (pl. '1' → 1).
+  // Enélkül cat.id === event.category összehasonlítás mindig false lenne.
+  var range = sheet.getRange(2, 1, rows.length, headers.length);
+  range.setNumberFormat('@');
+  range.setValues(rows);
 }
 
 /**
@@ -146,18 +152,20 @@ function readRows(sheet, headers) {
   var result = [];
 
   values.forEach(function (row) {
-    // Üres sor kihagyása
-    if (!row[0] && row[0] !== 0) return;
+    // Üres sor kihagyása (első oszlop üres)
+    if (row[0] === '' || row[0] === null || row[0] === undefined) return;
 
     var obj = {};
     headers.forEach(function (h, i) {
       var val = row[i];
-      // Boolean visszaállítása
-      if (val === 'true')  val = true;
-      if (val === 'false') val = false;
-      // Üres string → undefined (a frontend cleanEvent/cleanCategory szerint is hiányozhat)
-      if (val === '') val = undefined;
-      if (val !== undefined) obj[h] = val;
+      // Boolean visszaállítása (writeRows 'TRUE'/'FALSE'-ként menti)
+      if (val === 'TRUE' || val === true)  { obj[h] = true;  return; }
+      if (val === 'FALSE' || val === false) { obj[h] = false; return; }
+      // Üres cella → kihagyás (frontend cleanEvent/cleanCategory logikájával összhangban)
+      if (val === '' || val === null || val === undefined) return;
+      // Minden más: string (setNumberFormat('@') miatt mindig string jön vissza,
+      // de biztonság kedvéért explicit String() konverzió)
+      obj[h] = String(val);
     });
     result.push(obj);
   });
@@ -185,7 +193,9 @@ function writeMetaRow(metSheet, semester) {
     var v = semester[h];
     return (v === undefined || v === null) ? '' : String(v);
   });
-  metSheet.getRange(2, 1, 1, META_HEADERS.length).setValues([row]);
+  var metRange = metSheet.getRange(2, 1, 1, META_HEADERS.length);
+  metRange.setNumberFormat('@');
+  metRange.setValues([row]);
 }
 
 /**

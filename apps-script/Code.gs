@@ -185,7 +185,9 @@ function writeMetaRow(metSheet, semester) {
     var v = semester[h];
     return (v === undefined || v === null) ? '' : String(v);
   });
-  metSheet.getRange(2, 1, 1, META_HEADERS.length).setValues([row]);
+  var metRange = metSheet.getRange(2, 1, 1, META_HEADERS.length);
+  metRange.setNumberFormat('@');
+  metRange.setValues([row]);
 }
 
 /**
