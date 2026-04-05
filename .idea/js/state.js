@@ -42,6 +42,14 @@ export class AppState {
         this.data.form[field] = value;
     }
 
+    // Update a single category field silently (no re-render – for live typing in category cards)
+    updateCategoryField(id, fields) {
+        const index = this.data.categories.findIndex(c => c.id === id);
+        if (index !== -1) {
+            this.data.categories[index] = { ...this.data.categories[index], ...fields };
+        }
+    }
+
     // Get empty form template
     getEmptyForm() {
         return {

@@ -144,17 +144,17 @@ class TimelineApp {
 
     bindUploadDownload() {
         const uploadBtn = document.getElementById('upload-btn');
-        if (uploadBtn) {
-            uploadBtn.replaceWith(uploadBtn.cloneNode(true));
-            document.getElementById('upload-btn').addEventListener('click', () => {
+        if (uploadBtn && !uploadBtn.dataset.bound) {
+            uploadBtn.dataset.bound = '1';
+            uploadBtn.addEventListener('click', () => {
                 this.fileHandler.triggerUpload();
             });
         }
 
         const downloadBtn = document.getElementById('download-btn');
-        if (downloadBtn) {
-            downloadBtn.replaceWith(downloadBtn.cloneNode(true));
-            document.getElementById('download-btn').addEventListener('click', () => {
+        if (downloadBtn && !downloadBtn.dataset.bound) {
+            downloadBtn.dataset.bound = '1';
+            downloadBtn.addEventListener('click', () => {
                 this.fileHandler.downloadJSON();
             });
         }
@@ -162,28 +162,27 @@ class TimelineApp {
 
     bindFormActions() {
         const saveBtn = document.getElementById('save-btn');
-        const deleteBtn = document.getElementById('delete-btn');
-        const clearBtn = document.getElementById('clear-btn');
-
-        if (saveBtn) {
-            saveBtn.replaceWith(saveBtn.cloneNode(true));
-            document.getElementById('save-btn').addEventListener('click', () => {
+        if (saveBtn && !saveBtn.dataset.bound) {
+            saveBtn.dataset.bound = '1';
+            saveBtn.addEventListener('click', () => {
                 this.eventManager.saveEvent();
                 this.closeMobileSidebar();
             });
         }
 
-        if (deleteBtn) {
-            deleteBtn.replaceWith(deleteBtn.cloneNode(true));
-            document.getElementById('delete-btn').addEventListener('click', () => {
+        const deleteBtn = document.getElementById('delete-btn');
+        if (deleteBtn && !deleteBtn.dataset.bound) {
+            deleteBtn.dataset.bound = '1';
+            deleteBtn.addEventListener('click', () => {
                 this.eventManager.deleteEvent();
                 this.closeMobileSidebar();
             });
         }
 
-        if (clearBtn) {
-            clearBtn.replaceWith(clearBtn.cloneNode(true));
-            document.getElementById('clear-btn').addEventListener('click', () => {
+        const clearBtn = document.getElementById('clear-btn');
+        if (clearBtn && !clearBtn.dataset.bound) {
+            clearBtn.dataset.bound = '1';
+            clearBtn.addEventListener('click', () => {
                 this.eventManager.clearForm();
                 this.closeMobileSidebar();
             });
@@ -192,19 +191,18 @@ class TimelineApp {
 
     bindViewSwitcher() {
         const calendarBtn = document.getElementById('view-calendar');
-        const timelineBtn = document.getElementById('view-timeline');
-
-        if (calendarBtn) {
-            calendarBtn.replaceWith(calendarBtn.cloneNode(true));
-            document.getElementById('view-calendar').addEventListener('click', () => {
+        if (calendarBtn && !calendarBtn.dataset.bound) {
+            calendarBtn.dataset.bound = '1';
+            calendarBtn.addEventListener('click', () => {
                 this.state.update('currentView', 'calendar');
                 this.switchView('calendar');
             });
         }
 
-        if (timelineBtn) {
-            timelineBtn.replaceWith(timelineBtn.cloneNode(true));
-            document.getElementById('view-timeline').addEventListener('click', () => {
+        const timelineBtn = document.getElementById('view-timeline');
+        if (timelineBtn && !timelineBtn.dataset.bound) {
+            timelineBtn.dataset.bound = '1';
+            timelineBtn.addEventListener('click', () => {
                 this.state.update('currentView', 'timeline');
                 this.switchView('timeline');
             });
@@ -217,9 +215,9 @@ class TimelineApp {
 
         formFields.forEach(field => {
             const input = document.getElementById(`form-${field}`);
-            if (input) {
-                input.replaceWith(input.cloneNode(true));
-                document.getElementById(`form-${field}`).addEventListener('input', (e) => {
+            if (input && !input.dataset.bound) {
+                input.dataset.bound = '1';
+                input.addEventListener('input', (e) => {
                     this.state.updateFormField(field, e.target.value);
                 });
             }
@@ -227,25 +225,32 @@ class TimelineApp {
     }
 
     bindCategoryButtons() {
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(btn => {
-            const newBtn = btn.cloneNode(true);
-            btn.replaceWith(newBtn);
-            newBtn.addEventListener('click', () => {
-                const categoryId = newBtn.getAttribute('data-category');
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
+                const categoryId = btn.getAttribute('data-category');
                 this.state.updateFormField('category', categoryId);
-                this.ui.renderSidebar();
-                this.rebindEvents();
+                // Update button styles in-place – no full sidebar re-render
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    const cat = this.state.data.categories.find(c => c.id === b.getAttribute('data-category'));
+                    const selected = b.getAttribute('data-category') === categoryId;
+                    b.classList.toggle('selected', selected);
+                    if (cat) {
+                        b.style.backgroundColor = selected ? cat.color : `${cat.color}20`;
+                        b.style.color = selected ? '#fff' : cat.color;
+                        b.style.borderColor = cat.color;
+                    }
+                });
             });
         });
     }
 
     bindHungarianOnly() {
         const checkbox = document.getElementById('form-hungarianOnly');
-        if (checkbox) {
-            const newCb = checkbox.cloneNode(true);
-            checkbox.replaceWith(newCb);
-            newCb.addEventListener('change', (e) => {
+        if (checkbox && !checkbox.dataset.bound) {
+            checkbox.dataset.bound = '1';
+            checkbox.addEventListener('change', (e) => {
                 this.state.updateFormField('hungarianOnly', e.target.checked);
             });
         }
@@ -255,38 +260,43 @@ class TimelineApp {
         const semFields = ['id', 'name', 'nameEn', 'startDate', 'endDate'];
         semFields.forEach(field => {
             const input = document.getElementById(`sem-${field}`);
-            if (input) {
-                const newInput = input.cloneNode(true);
-                input.replaceWith(newInput);
-                newInput.addEventListener('input', (e) => {
+            if (input && !input.dataset.bound) {
+                input.dataset.bound = '1';
+                input.addEventListener('input', (e) => {
                     this.state.updateSemester({ [field]: e.target.value });
                 });
             }
         });
         // Status select – special handling
         const statusSel = document.getElementById('sem-status');
-        if (statusSel) {
-            const newSel = statusSel.cloneNode(true);
-            statusSel.replaceWith(newSel);
-            newSel.addEventListener('change', (e) => {
+        if (statusSel && !statusSel.dataset.bound) {
+            statusSel.dataset.bound = '1';
+            statusSel.addEventListener('change', (e) => {
                 this.handleSemesterStatusChange(e.target.value);
             });
         }
     }
 
     bindCategoryManager() {
-        // Bind inline edit inputs on each category row (update on input, no re-render)
+        // Bind inline edit inputs on each category row (silent update on typing – no re-render)
         document.querySelectorAll('.cat-card').forEach(row => {
+            if (row.dataset.bound) return;
+            row.dataset.bound = '1';
             const catId = row.getAttribute('data-cat-id');
 
             const bindField = (selector, stateKey, isCheckbox = false) => {
                 const el = row.querySelector(selector);
                 if (!el) return;
-                const newEl = el.cloneNode(true);
-                el.replaceWith(newEl);
                 const evt = isCheckbox ? 'change' : 'input';
-                newEl.addEventListener(evt, (e) => {
-                    this.state.updateCategory(catId, { [stateKey]: isCheckbox ? e.target.checked : e.target.value });
+                el.addEventListener(evt, (e) => {
+                    const value = isCheckbox ? e.target.checked : e.target.value;
+                    // Silent update – no re-render, cursor stays put
+                    this.state.updateCategoryField(catId, { [stateKey]: value });
+                    // Live feedback: sync card header name display
+                    if (stateKey === 'name') {
+                        const nameSpan = row.querySelector('.cat-card-name');
+                        if (nameSpan) nameSpan.textContent = value;
+                    }
                 });
             };
 
@@ -296,12 +306,10 @@ class TimelineApp {
             bindField('.cat-hu-only', 'hungarianOnly', true);
             bindField('.cat-en-only', 'englishOnly', true);
 
-            // Delete button
+            // Delete button – re-render is fine here (card is removed)
             const delBtn = row.querySelector('.btn-del-cat');
             if (delBtn) {
-                const newDelBtn = delBtn.cloneNode(true);
-                delBtn.replaceWith(newDelBtn);
-                newDelBtn.addEventListener('click', () => {
+                delBtn.addEventListener('click', () => {
                     if (!confirm('Biztosan törölni szeretnéd ezt a kategóriát?')) return;
                     this.state.deleteCategory(catId);
                     this.ui.renderSidebar();
@@ -312,10 +320,9 @@ class TimelineApp {
 
         // Add new category button
         const addBtn = document.getElementById('add-category-btn');
-        if (addBtn) {
-            const newAddBtn = addBtn.cloneNode(true);
-            addBtn.replaceWith(newAddBtn);
-            newAddBtn.addEventListener('click', () => {
+        if (addBtn && !addBtn.dataset.bound) {
+            addBtn.dataset.bound = '1';
+            addBtn.addEventListener('click', () => {
                 const newId = 'kat-' + Date.now();
                 this.state.addCategory({
                     id: newId,
@@ -332,18 +339,18 @@ class TimelineApp {
     bindNewSemesterBtn() {
         ['new-semester-btn-empty'].forEach(id => {
             const btn = document.getElementById(id);
-            if (btn) {
-                btn.replaceWith(btn.cloneNode(true));
-                document.getElementById(id).addEventListener('click', () => {
+            if (btn && !btn.dataset.bound) {
+                btn.dataset.bound = '1';
+                btn.addEventListener('click', () => {
                     this.openNewSemesterWizard();
                 });
             }
         });
         // Félévek kezelő gomb a headerben
         const smBtn = document.getElementById('semester-manager-btn');
-        if (smBtn) {
-            smBtn.replaceWith(smBtn.cloneNode(true));
-            document.getElementById('semester-manager-btn').addEventListener('click', () => {
+        if (smBtn && !smBtn.dataset.bound) {
+            smBtn.dataset.bound = '1';
+            smBtn.addEventListener('click', () => {
                 this.openSemesterManager();
             });
         }
@@ -512,9 +519,9 @@ class TimelineApp {
 
     bindMobileToggle() {
         const btn = document.getElementById('mobile-sidebar-btn');
-        if (btn) {
-            btn.replaceWith(btn.cloneNode(true));
-            document.getElementById('mobile-sidebar-btn').addEventListener('click', () => {
+        if (btn && !btn.dataset.bound) {
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
                 this.toggleMobileSidebar();
             });
         }
@@ -545,12 +552,11 @@ class TimelineApp {
     // ── Esemény kereső ─────────────────────────────────────────────
     bindSearchEvents() {
         const input = document.getElementById('event-search-input');
-        if (!input) return;
-        input.replaceWith(input.cloneNode(true));
-        const fresh = document.getElementById('event-search-input');
-        fresh.addEventListener('input', () => this.handleSearchInput(fresh.value));
-        fresh.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { fresh.value = ''; this.closeSearchDropdown(); }
+        if (!input || input.dataset.bound) return;
+        input.dataset.bound = '1';
+        input.addEventListener('input', () => this.handleSearchInput(input.value));
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { input.value = ''; this.closeSearchDropdown(); }
         });
     }
 
@@ -657,21 +663,21 @@ class TimelineApp {
 
     bindCloudButtons() {
         const s = document.getElementById('cloud-settings-btn');
-        if (s) {
-            s.replaceWith(s.cloneNode(true));
-            document.getElementById('cloud-settings-btn').addEventListener('click', () => this.openCloudSettings());
+        if (s && !s.dataset.bound) {
+            s.dataset.bound = '1';
+            s.addEventListener('click', () => this.openCloudSettings());
         }
 
         const l = document.getElementById('cloud-load-btn');
-        if (l) {
-            l.replaceWith(l.cloneNode(true));
-            document.getElementById('cloud-load-btn').addEventListener('click', () => this.loadFromCloud());
+        if (l && !l.dataset.bound) {
+            l.dataset.bound = '1';
+            l.addEventListener('click', () => this.loadFromCloud());
         }
 
         const sv = document.getElementById('cloud-save-btn');
-        if (sv) {
-            sv.replaceWith(sv.cloneNode(true));
-            document.getElementById('cloud-save-btn').addEventListener('click', () => this.saveToCloud());
+        if (sv && !sv.dataset.bound) {
+            sv.dataset.bound = '1';
+            sv.addEventListener('click', () => this.saveToCloud());
         }
     }
 
@@ -770,9 +776,9 @@ class TimelineApp {
 
     bindSemesterSwitcher() {
         const btn = document.getElementById('semester-switcher-btn');
-        if (btn) {
-            btn.replaceWith(btn.cloneNode(true));
-            document.getElementById('semester-switcher-btn').addEventListener('click', (e) => {
+        if (btn && !btn.dataset.bound) {
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.toggleSemesterDropdown();
             });
