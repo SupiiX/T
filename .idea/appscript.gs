@@ -96,11 +96,22 @@ function getOrCreateStructuredSheets(ss, sheetName) {
 
 /**
  * Törli a 2. sortól az összes adatsort, majd batch-írja az új sorokat.
+ * Ha az 1. sor nem tartalmazza a helyes fejléceket (pl. régi JSON-blob formátum),
+ * törli a sheet teljes tartalmát és újraírja a fejlécsort.
  * @param {Sheet} sheet
  * @param {string[]} headers - oszlopnevek (sorrendben)
  * @param {Object[]} items   - objektum tömb
  */
 function writeRows(sheet, headers, items) {
+  // Fejlécsor ellenőrzése – ha hiányzik vagy eltér (pl. régi JSON blob az A1-ben)
+  var existingHeader = sheet.getRange(1, 1).getValue();
+  if (existingHeader !== headers[0]) {
+    sheet.clearContents();
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  }
+
+  // Adatsorok törlése (2. sortól)
   var lastRow = sheet.getLastRow();
   if (lastRow > 1) {
     sheet.deleteRows(2, lastRow - 1);
@@ -156,8 +167,15 @@ function readRows(sheet, headers) {
 
 /**
  * Írja a szemeszter metadata sort (META_HEADERS szerint).
+ * Fejlécet is ellenőrzi, szükség esetén (pl. régi formátum) újraírja.
  */
 function writeMetaRow(metSheet, semester) {
+  var existingHeader = metSheet.getRange(1, 1).getValue();
+  if (existingHeader !== META_HEADERS[0]) {
+    metSheet.clearContents();
+    metSheet.getRange(1, 1, 1, META_HEADERS.length).setValues([META_HEADERS]);
+    metSheet.getRange(1, 1, 1, META_HEADERS.length).setFontWeight('bold');
+  }
   var lastRow = metSheet.getLastRow();
   if (lastRow > 1) {
     metSheet.deleteRows(2, lastRow - 1);
