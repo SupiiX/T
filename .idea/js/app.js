@@ -387,9 +387,14 @@ class TimelineApp {
                 const newStatus = sel.value;
                 try {
                     await this.callCloud('setStatus', { sheet, status: newStatus });
-                    // Frissítjük a local listát és újranyitjuk a modalt
-                    const idx = this.state.data.semesterList.findIndex(s => s.sheet === sheet);
-                    if (idx !== -1) this.state.data.semesterList[idx].status = newStatus;
+                    // Frissítjük a local listát – ha active-ra vált, a korábbi active → archived
+                    this.state.data.semesterList = this.state.data.semesterList.map(s => {
+                        if (newStatus === 'active' && s.status === 'active' && s.sheet !== sheet) {
+                            return { ...s, status: 'archived' };
+                        }
+                        if (s.sheet === sheet) return { ...s, status: newStatus };
+                        return s;
+                    });
                     // Ha az éppen aktív félévet változtatjuk, frissítjük a semester objektumot is
                     if (sheet === this.state.data.activeSemesterSheet && this.state.data.semester) {
                         this.state.data.semester.status = newStatus;

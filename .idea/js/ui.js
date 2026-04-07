@@ -551,7 +551,7 @@ export class UIManager {
                       ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
                       : `<span class="sem-row-active-label">Aktív szerkesztés</span>`
                   }
-                  ${s.status === 'archived'
+                  ${s.status !== 'active'
                       ? `<button class="btn btn-danger-ghost sem-delete-btn" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}" title="Félév törlése" style="font-size:0.78rem;padding:0.25rem 0.5rem">${Icons.Trash2}</button>`
                       : ''
                   }
