@@ -319,9 +319,13 @@ function doPost(e) {
 
     // ── Félév törlése ──────────────────────────────────────
     if (action === 'deleteSemester') {
-      var sheetToDel = ss.getSheetByName(payload.sheet);
-      if (sheetToDel) ss.deleteSheet(sheetToDel);
-      var afterDel = getIndexData().filter(function (s) { return s.sheet !== payload.sheet; });
+      var baseName = payload.sheet;
+      // Mind a 3 strukturált lapot töröljük (events, categories, meta)
+      [baseName, baseName + '_Categories', baseName + '_Meta'].forEach(function (name) {
+        var s = ss.getSheetByName(name);
+        if (s) ss.deleteSheet(s);
+      });
+      var afterDel = getIndexData().filter(function (s) { return s.sheet !== baseName; });
       saveIndexData(afterDel);
       return jsonResponse({ status: 'ok' });
     }

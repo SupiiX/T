@@ -434,8 +434,16 @@ class TimelineApp {
             confirmBtn.textContent = 'Törlés…';
             try {
                 await this.callCloud('deleteSemester', { sheet });
+                // Eltávolítjuk a lokális listából
                 this.state.data.semesterList = this.state.data.semesterList.filter(s => s.sheet !== sheet);
                 this.state.notify('semesterList');
+                // Ha az éppen betöltött félévet töröltük, tisztítjuk a state-et
+                // (különben a "Mentés" gomb visszaírná a törölt adatokat a felhőbe)
+                if (sheet === this.state.data.activeSemesterSheet) {
+                    this.state.loadData({ events: [], categories: [], semester: null });
+                    this.state.setActiveSemesterSheet(null);
+                    this.state.update('fileName', '');
+                }
                 document.getElementById('sem-delete-modal')?.remove();
                 showToast(`"${semName}" félév törölve`, 'success');
                 this.openSemesterManager();
