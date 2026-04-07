@@ -396,11 +396,10 @@ export class UIManager {
         </div>
         <div class="form-field">
           <label>Státusz</label>
-          <select id="sem-status" class="sem-status-select">
-            <option value="draft" ${status === 'draft' ? 'selected' : ''}>Tervezett</option>
-            <option value="active" ${status === 'active' ? 'selected' : ''}>Aktív</option>
-            <option value="archived" ${status === 'archived' ? 'selected' : ''}>Archivált</option>
-          </select>
+          <div class="sem-status-auto">
+            <span class="status-badge status-${status}">${this.statusLabel(status)}</span>
+            <span class="sem-status-auto-hint">automatikusan számított</span>
+          </div>
         </div>
       </div>
     `;
@@ -542,11 +541,7 @@ export class UIManager {
                   ${s.startDate ? `<span class="sem-row-dates">${s.startDate}${s.endDate ? ' – ' + s.endDate : ''}</span>` : ''}
                 </div>
                 <div class="sem-row-actions">
-                  <select class="sem-status-select sem-status-inline" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}">
-                    ${['draft', 'active', 'archived'].map(v =>
-                        `<option value="${v}" ${s.status === v ? 'selected' : ''}>${this.statusLabel(v)}</option>`
-                    ).join('')}
-                  </select>
+                  <span class="status-badge status-${s.status}">${this.statusLabel(s.status)}</span>
                   ${s.sheet !== current
                       ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
                       : `<span class="sem-row-active-label">Aktív szerkesztés</span>`

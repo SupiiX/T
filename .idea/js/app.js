@@ -8,6 +8,7 @@ import { FileHandler } from './file-handler.js';
 import { EventManager } from './event-manager.js';
 import { formatDateShort } from './utils.js';
 import { Icons } from './icons.js';
+import { computeSemesterStatus, getDefaultDates } from './semester-config.js';
 
 // Toast notification utility (also exposed globally for other modules)
 function showToast(message, type = 'info', duration = 3500) {
@@ -267,14 +268,6 @@ class TimelineApp {
                 });
             }
         });
-        // Status select – special handling
-        const statusSel = document.getElementById('sem-status');
-        if (statusSel && !statusSel.dataset.bound) {
-            statusSel.dataset.bound = '1';
-            statusSel.addEventListener('change', (e) => {
-                this.handleSemesterStatusChange(e.target.value);
-            });
-        }
     }
 
     bindCategoryManager() {
@@ -380,35 +373,7 @@ class TimelineApp {
             });
         });
 
-        // Státuszváltás a manager listából
-        document.querySelectorAll('.sem-status-inline').forEach(sel => {
-            sel.addEventListener('change', async () => {
-                const sheet = sel.getAttribute('data-sheet');
-                const newStatus = sel.value;
-                try {
-                    await this.callCloud('setStatus', { sheet, status: newStatus });
-                    // Frissítjük a local listát – ha active-ra vált, a korábbi active → archived
-                    this.state.data.semesterList = this.state.data.semesterList.map(s => {
-                        if (newStatus === 'active' && s.status === 'active' && s.sheet !== sheet) {
-                            return { ...s, status: 'archived' };
-                        }
-                        if (s.sheet === sheet) return { ...s, status: newStatus };
-                        return s;
-                    });
-                    // Ha az éppen aktív félévet változtatjuk, frissítjük a semester objektumot is
-                    if (sheet === this.state.data.activeSemesterSheet && this.state.data.semester) {
-                        this.state.data.semester.status = newStatus;
-                        this.state.notify('semester');
-                    }
-                    reopen();
-                } catch (err) {
-                    showToast('Státusz mentése sikertelen: ' + err.message, 'error');
-                    reopen();
-                }
-            });
-        });
-
-        // Törlés gomb – csak archivált félévekhez jelenik meg
+        // Törlés gomb – aktív félévhez nem jelenik meg
         document.querySelectorAll('.sem-delete-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const sheet = btn.getAttribute('data-sheet');
@@ -479,14 +444,22 @@ class TimelineApp {
         const picker = document.querySelector('.wiz-sem-picker');
         if (picker) {
             const updatePicker = () => {
-                const year   = parseInt(picker.dataset.year);
-                const minYear= parseInt(picker.dataset.minYear);
-                const sem    = parseInt(picker.dataset.sem);
+                const year    = parseInt(picker.dataset.year);
+                const minYear = parseInt(picker.dataset.minYear);
+                const sem     = parseInt(picker.dataset.sem);
                 const shortEnd = String(year + 1).slice(-2);
                 picker.querySelector('.wiz-year-label').textContent = `${year}/${shortEnd}`;
                 picker.querySelector('.wiz-name-code').textContent  = `${year}/${shortEnd}/${sem}`;
                 picker.querySelector('.wiz-year-dec').disabled = year <= minYear;
+                // Auto-kitöltés: dátummezők frissítése a config alapján
+                const dates = getDefaultDates(year, sem);
+                const startInput = document.getElementById('wiz-startDate');
+                const endInput   = document.getElementById('wiz-endDate');
+                if (startInput) startInput.value = dates.startDate;
+                if (endInput)   endInput.value   = dates.endDate;
             };
+            // Kezdeti kitöltés
+            updatePicker();
 
             picker.querySelector('.wiz-year-dec')?.addEventListener('click', () => {
                 picker.dataset.year = parseInt(picker.dataset.year) - 1;
@@ -558,8 +531,8 @@ class TimelineApp {
             nameEn,
             startDate: val('wiz-startDate'),
             endDate:   val('wiz-endDate'),
-            status: 'draft'
         };
+        semester.status = computeSemesterStatus(semester);
 
         const categories = [];
         document.querySelectorAll('.wizard-cat-row').forEach((row, i) => {
@@ -584,7 +557,7 @@ class TimelineApp {
                 sheet: sheetName,
                 name,
                 nameEn,
-                status:    'draft',
+                status:    semester.status,
                 startDate: semester.startDate || '',
                 endDate:   semester.endDate   || ''
             });
@@ -926,6 +899,18 @@ class TimelineApp {
         document.getElementById('loading-overlay')?.remove();
     }
 
+    // ── Számított státuszok szinkronizálása ────────────────
+    // A státusz mindig a tárolt startDate/endDate alapján kerül meghatározásra.
+    // Ezt hívjuk meg minden betöltés után, hogy a UI mindig naprakész legyen.
+    syncComputedStatuses() {
+        this.state.data.semesterList = this.state.data.semesterList.map(s => ({
+            ...s, status: computeSemesterStatus(s)
+        }));
+        if (this.state.data.semester) {
+            this.state.data.semester.status = computeSemesterStatus(this.state.data.semester);
+        }
+    }
+
     // ── Cloud inicializálás induláskor ─────────────────────
     async initCloud() {
         try {
@@ -953,6 +938,7 @@ class TimelineApp {
             const list = await res.json();
             if (Array.isArray(list)) {
                 this.state.loadSemesterList(list);
+                this.syncComputedStatuses();
             }
         } catch (e) {
             console.warn('Semester list load failed:', e);
@@ -978,10 +964,10 @@ class TimelineApp {
                 return;
             }
             const data = JSON.parse(text);
-            // Status injektálása az _index-ből (fallback: draft)
-            const meta = this.state.data.semesterList.find(s => s.sheet === sheetName);
-            if (data.semester) data.semester.status = meta?.status || 'draft';
+            // Státusz kiszámítása dátumok alapján (nem a tárolt értéket használjuk)
+            if (data.semester) data.semester.status = computeSemesterStatus(data.semester);
             this.state.loadData(data);
+            this.syncComputedStatuses();
             this.state.setActiveSemesterSheet(sheetName);
             const name = data.semester?.name?.replace(/\s+/g, '_') || sheetName;
             this.state.update('fileName', name + '.json');
@@ -1020,7 +1006,9 @@ class TimelineApp {
             const text = await res.text();
             if (!text || text.trim() === '{}') { showToast('A felhőben még nincs mentett adat.', 'info'); return; }
             const data = JSON.parse(text);
+            if (data.semester) data.semester.status = computeSemesterStatus(data.semester);
             this.state.loadData(data);
+            this.syncComputedStatuses();
             const name = data.semester?.name?.replace(/\s+/g, '_') || 'felho';
             this.state.update('fileName', name + '.json');
             // ── Auto-migráció: OrarendData regisztrálása _index-be ──
@@ -1031,7 +1019,7 @@ class TimelineApp {
                     sheet: sheetId,
                     name: sem.name || '',
                     nameEn: sem.nameEn || '',
-                    status: sem.status || 'active',
+                    status: computeSemesterStatus(sem),
                     startDate: sem.startDate || '',
                     endDate: sem.endDate || ''
                 };
@@ -1127,34 +1115,6 @@ class TimelineApp {
         }
     }
 
-    // ── Státusz változtatás ────────────────────────────────
-    async handleSemesterStatusChange(newStatus) {
-        const sheetName = this.state.data.activeSemesterSheet;
-        this.state.updateSemester({ status: newStatus });
-
-        if (!localStorage.getItem('calendar_script_url') || !sheetName) return;
-
-        // Lokális lista frissítése
-        const list = this.state.data.semesterList.map(s => {
-            if (newStatus === 'active' && s.status === 'active') return { ...s, status: 'archived' };
-            if (s.sheet === sheetName) return { ...s, status: newStatus };
-            return s;
-        });
-        this.state.loadSemesterList(list);
-
-        // Felhő frissítése
-        const url = localStorage.getItem('calendar_script_url');
-        try {
-            await fetch(url, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({ action: 'setStatus', sheet: sheetName, status: newStatus })
-            });
-        } catch (e) {
-            console.warn('setStatus cloud sync failed:', e);
-        }
-    }
 }
 
 // Initialize app when DOM is ready

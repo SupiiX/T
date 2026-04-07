@@ -144,6 +144,20 @@
     margin-bottom: 0;
 }
 
+/* ── Automatikus státusz kijelző (Adatok tab) ─────────── */
+.sem-status-auto {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+}
+
+.sem-status-auto-hint {
+    font-size: 0.72rem;
+    color: var(--color-gray-400);
+    font-style: italic;
+}
+
 .section-label {
     font-size: 0.68rem;
     font-weight: 700;
