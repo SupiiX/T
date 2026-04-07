@@ -446,3 +446,60 @@
     color: var(--color-gray-400);
     line-height: 1.6;
 }
+
+/* ── Félévszámláló (X / 3) ───────────────────────────── */
+.sem-slot-counter {
+    margin-left: auto;
+    margin-right: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-gray-400);
+    background: var(--color-gray-100);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+}
+
+.sem-slot-full {
+    color: var(--color-danger, #ef4444);
+    background: color-mix(in srgb, var(--color-danger, #ef4444) 12%, white);
+}
+
+/* ── Státusz select a manager sorban ─────────────────── */
+.sem-status-inline {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-sm, 4px);
+    background: var(--color-surface, #fff);
+    cursor: pointer;
+    color: var(--color-gray-700);
+}
+
+.sem-status-inline:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+/* ── Limit hint a lista alatt ───────────────────────── */
+.sem-limit-hint {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.78rem;
+    color: var(--color-danger, #ef4444);
+    background: color-mix(in srgb, var(--color-danger, #ef4444) 8%, white);
+    border-top: 1px solid color-mix(in srgb, var(--color-danger, #ef4444) 20%, white);
+    margin: 0;
+}
+
+/* ── Törlés gomb a manager sorban ───────────────────── */
+.sem-delete-btn {
+    color: var(--color-danger, #ef4444);
+    border-color: transparent;
+    padding: 0.25rem 0.45rem !important;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+
+.sem-delete-btn:hover {
+    opacity: 1;
+    background: color-mix(in srgb, var(--color-danger, #ef4444) 10%, transparent);
+}

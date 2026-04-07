@@ -360,6 +360,7 @@ class TimelineApp {
         document.getElementById('semester-manager-modal')?.remove();
         document.body.insertAdjacentHTML('beforeend', this.ui.renderSemesterManagerModal());
 
+        const reopen = () => this.openSemesterManager();
         const close = () => document.getElementById('semester-manager-modal')?.remove();
         document.getElementById('sem-manager-close')?.addEventListener('click', close);
         document.getElementById('sem-manager-close2')?.addEventListener('click', close);
@@ -377,6 +378,78 @@ class TimelineApp {
                 close();
                 this.loadSemesterFromCloud(btn.getAttribute('data-sheet'));
             });
+        });
+
+        // Státuszváltás a manager listából
+        document.querySelectorAll('.sem-status-inline').forEach(sel => {
+            sel.addEventListener('change', async () => {
+                const sheet = sel.getAttribute('data-sheet');
+                const newStatus = sel.value;
+                try {
+                    await this.callCloud('setStatus', { sheet, status: newStatus });
+                    // Frissítjük a local listát és újranyitjuk a modalt
+                    const idx = this.state.data.semesterList.findIndex(s => s.sheet === sheet);
+                    if (idx !== -1) this.state.data.semesterList[idx].status = newStatus;
+                    // Ha az éppen aktív félévet változtatjuk, frissítjük a semester objektumot is
+                    if (sheet === this.state.data.activeSemesterSheet && this.state.data.semester) {
+                        this.state.data.semester.status = newStatus;
+                        this.state.notify('semester');
+                    }
+                    reopen();
+                } catch (err) {
+                    showToast('Státusz mentése sikertelen: ' + err.message, 'error');
+                    reopen();
+                }
+            });
+        });
+
+        // Törlés gomb – csak archivált félévekhez jelenik meg
+        document.querySelectorAll('.sem-delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sheet = btn.getAttribute('data-sheet');
+                const name  = btn.getAttribute('data-name');
+                close();
+                this.openSemesterDeleteConfirm(sheet, name);
+            });
+        });
+    }
+
+    openSemesterDeleteConfirm(sheet, semName) {
+        document.getElementById('sem-delete-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', this.ui.renderSemesterDeleteConfirm(semName));
+
+        const cancelAndBack = () => {
+            document.getElementById('sem-delete-modal')?.remove();
+            this.openSemesterManager();
+        };
+
+        document.getElementById('sem-delete-cancel')?.addEventListener('click', cancelAndBack);
+        document.getElementById('sem-delete-modal')?.addEventListener('click', e => {
+            if (e.target.id === 'sem-delete-modal') cancelAndBack();
+        });
+
+        const input = document.getElementById('sem-delete-confirm-input');
+        const confirmBtn = document.getElementById('sem-delete-confirm-btn');
+
+        input?.addEventListener('input', () => {
+            confirmBtn.disabled = input.value.trim() !== semName.trim();
+        });
+
+        confirmBtn?.addEventListener('click', async () => {
+            if (input.value.trim() !== semName.trim()) return;
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Törlés…';
+            try {
+                await this.callCloud('deleteSemester', { sheet });
+                this.state.data.semesterList = this.state.data.semesterList.filter(s => s.sheet !== sheet);
+                this.state.notify('semesterList');
+                document.getElementById('sem-delete-modal')?.remove();
+                showToast(`"${semName}" félév törölve`, 'success');
+                this.openSemesterManager();
+            } catch (err) {
+                showToast('Törlés sikertelen: ' + err.message, 'error');
+                cancelAndBack();
+            }
         });
     }
 
@@ -1014,6 +1087,20 @@ class TimelineApp {
             const b = document.getElementById('cloud-save-btn');
             if (b) b.disabled = false;
         }
+    }
+
+    // ── Általános felhő POST helper ────────────────────────
+    async callCloud(action, payload = {}) {
+        const url = localStorage.getItem('calendar_script_url');
+        if (!url) throw new Error('Nincs felhő kapcsolat');
+        const res = await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action, ...payload })
+        });
+        // no-cors → mindig opaque válasz, hibát nem tudunk detektálni
+        return res;
     }
 
     // ── Új félév létrehozása a felhőben ────────────────────

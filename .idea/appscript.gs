@@ -325,6 +325,15 @@ function doPost(e) {
       return jsonResponse({ status: 'ok' });
     }
 
+    // ── Félév törlése ──────────────────────────────────────
+    if (action === 'deleteSemester') {
+      var sheetToDel = ss.getSheetByName(payload.sheet);
+      if (sheetToDel) ss.deleteSheet(sheetToDel);
+      var afterDel = getIndexData().filter(function (s) { return s.sheet !== payload.sheet; });
+      saveIndexData(afterDel);
+      return jsonResponse({ status: 'ok' });
+    }
+
     // ── Félév adatainak mentése ────────────────────────────
     if (action === 'save') {
       var data;

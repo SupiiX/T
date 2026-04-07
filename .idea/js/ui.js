@@ -523,9 +523,15 @@ export class UIManager {
         const list = this.state.data.semesterList;
         const current = this.state.data.activeSemesterSheet;
         const hasCloud = !!localStorage.getItem('calendar_script_url');
+        const MAX_SEMESTERS = 3;
+        const atLimit = list.length >= MAX_SEMESTERS;
 
         const statusOrder = { active: 0, draft: 1, archived: 2 };
         const sorted = [...list].sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
+
+        const statusOptions = ['draft', 'active', 'archived'].map(v =>
+            `<option value="${v}">${this.statusLabel(v)}</option>`
+        ).join('');
 
         const rows = sorted.length === 0
             ? `<p class="sem-manager-empty">Még nincs nyilvántartott félév.<br>Hozz létre egyet az alábbi gombbal, vagy töltsd be a felhőből.</p>`
@@ -536,23 +542,33 @@ export class UIManager {
                   ${s.startDate ? `<span class="sem-row-dates">${s.startDate}${s.endDate ? ' – ' + s.endDate : ''}</span>` : ''}
                 </div>
                 <div class="sem-row-actions">
-                  <span class="status-badge status-${s.status}">${this.statusLabel(s.status)}</span>
+                  <select class="sem-status-select sem-status-inline" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}">
+                    ${['draft', 'active', 'archived'].map(v =>
+                        `<option value="${v}" ${s.status === v ? 'selected' : ''}>${this.statusLabel(v)}</option>`
+                    ).join('')}
+                  </select>
                   ${s.sheet !== current
                       ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
                       : `<span class="sem-row-active-label">Aktív szerkesztés</span>`
+                  }
+                  ${s.status === 'archived'
+                      ? `<button class="btn btn-danger-ghost sem-delete-btn" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}" title="Félév törlése" style="font-size:0.78rem;padding:0.25rem 0.5rem">${Icons.Trash2}</button>`
+                      : ''
                   }
                 </div>
               </div>`).join('');
 
         return `
       <div id="semester-manager-modal" class="wizard-overlay">
-        <div class="wizard-box" style="width:520px">
+        <div class="wizard-box" style="width:540px">
           <div class="wizard-header">
             <h2>Félévek kezelése</h2>
+            <span class="sem-slot-counter ${atLimit ? 'sem-slot-full' : ''}">${list.length} / ${MAX_SEMESTERS}</span>
             <button id="sem-manager-close" class="btn btn-ghost icon-only" style="padding:0.3rem">✕</button>
           </div>
           <div class="wizard-body" style="padding:0">
             <div class="sem-manager-list">${rows}</div>
+            ${atLimit ? `<p class="sem-limit-hint">Maximum ${MAX_SEMESTERS} félév tárolható (múlt · jelen · jövő). Törölj egy archivált félévet, hogy újat hozhass létre.</p>` : ''}
           </div>
           <div class="wizard-footer" style="justify-content:space-between">
             <div style="font-size:0.75rem;color:var(--color-gray-400)">
@@ -560,10 +576,33 @@ export class UIManager {
             </div>
             <div style="display:flex;gap:0.5rem">
               <button id="sem-manager-close2" class="btn btn-ghost">Bezár</button>
-              <button id="sem-manager-new-btn" class="btn btn-primary">
+              <button id="sem-manager-new-btn" class="btn btn-primary" ${atLimit ? 'disabled title="Maximum 3 félév tárolható"' : ''}>
                 ${Icons.FilePlus} Új félév
               </button>
             </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    renderSemesterDeleteConfirm(semName) {
+        return `
+      <div id="sem-delete-modal" class="wizard-overlay">
+        <div class="wizard-box" style="width:420px">
+          <div class="wizard-header">
+            <h2>Félév törlése</h2>
+          </div>
+          <div class="wizard-body">
+            <p style="margin-bottom:1rem">Ez a művelet <strong>nem visszavonható</strong>. A felhőből is törlődik a félév minden adata.</p>
+            <p style="margin-bottom:1rem">Megerősítéshez írd be a félév nevét:</p>
+            <p style="font-weight:600;margin-bottom:0.75rem;color:var(--color-gray-200)">${this.escapeHtml(semName)}</p>
+            <div class="form-field">
+              <input type="text" id="sem-delete-confirm-input" placeholder="Félév neve" autocomplete="off">
+            </div>
+          </div>
+          <div class="wizard-footer" style="justify-content:flex-end;gap:0.5rem">
+            <button id="sem-delete-cancel" class="btn btn-ghost">Mégse</button>
+            <button id="sem-delete-confirm-btn" class="btn btn-danger" disabled>${Icons.Trash2} Törlés</button>
           </div>
         </div>
       </div>`;
