@@ -270,11 +270,11 @@ export class UIManager {
         <div class="form-row">
           <div class="form-field">
             <label>Kezdés</label>
-            <input type="date" id="form-date" value="${form.date}">
+            <input type="text" id="form-date" data-datepicker value="${form.date}" placeholder="éééé-hh-nn" autocomplete="off">
           </div>
           <div class="form-field">
             <label>Vége</label>
-            <input type="date" id="form-endDate" value="${form.endDate}">
+            <input type="text" id="form-endDate" data-datepicker value="${form.endDate}" placeholder="éééé-hh-nn" autocomplete="off">
           </div>
         </div>
 
@@ -387,11 +387,11 @@ export class UIManager {
         <div class="form-row">
           <div class="form-field">
             <label>Kezdete</label>
-            <input type="date" id="sem-startDate" value="${sem.startDate || ''}">
+            <input type="text" id="sem-startDate" data-datepicker value="${sem.startDate || ''}" placeholder="éééé-hh-nn" autocomplete="off">
           </div>
           <div class="form-field">
             <label>Vége</label>
-            <input type="date" id="sem-endDate" value="${sem.endDate || ''}">
+            <input type="text" id="sem-endDate" data-datepicker value="${sem.endDate || ''}" placeholder="éééé-hh-nn" autocomplete="off">
           </div>
         </div>
         <div class="form-field">
@@ -635,11 +635,11 @@ export class UIManager {
             </div>
             <div class="form-field" style="margin-top:var(--spacing-md)">
               <label>Kezdő dátum</label>
-              <input type="date" id="wiz-startDate">
+              <input type="text" id="wiz-startDate" data-datepicker placeholder="éééé-hh-nn" autocomplete="off">
             </div>
             <div class="form-field">
               <label>Záró dátum</label>
-              <input type="date" id="wiz-endDate">
+              <input type="text" id="wiz-endDate" data-datepicker placeholder="éééé-hh-nn" autocomplete="off">
             </div>
 
             <div class="wizard-cat-header">

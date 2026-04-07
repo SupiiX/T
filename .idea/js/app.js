@@ -130,6 +130,29 @@ class TimelineApp {
         this.bindSearchEvents();
         this.bindSidebarTabs();
         this.bindSemesterSwitcher();
+        this.initDatePickers();
+    }
+
+    // ── Flatpickr dátumválasztó inicializálás ──────────────
+    // Megkeresi az összes data-datepicker attribútumú inputot a megadott
+    // konténerben és Flatpickr-rel helyettesíti a böngésző natív pickerét.
+    initDatePickers(container = document) {
+        if (typeof flatpickr === 'undefined') return;
+        container.querySelectorAll('input[data-datepicker]').forEach(input => {
+            if (input._flatpickr) return; // már inicializálva
+            flatpickr(input, {
+                locale: 'hu',
+                dateFormat: 'Y-m-d',
+                allowInput: true,
+                disableMobile: true,
+                // Mentés a state-be: az onChange a change eseményen át megy,
+                // amit a bindFormInputs / bindSemesterInputs 'input' hallgatója fog
+                onChange: (_dates, dateStr) => {
+                    input.value = dateStr;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        });
     }
 
     bindSidebarTabs() {
@@ -455,10 +478,16 @@ class TimelineApp {
                 const dates = getDefaultDates(year, sem);
                 const startInput = document.getElementById('wiz-startDate');
                 const endInput   = document.getElementById('wiz-endDate');
-                if (startInput) startInput.value = dates.startDate;
-                if (endInput)   endInput.value   = dates.endDate;
+                if (startInput) {
+                    if (startInput._flatpickr) startInput._flatpickr.setDate(dates.startDate, false);
+                    else startInput.value = dates.startDate;
+                }
+                if (endInput) {
+                    if (endInput._flatpickr) endInput._flatpickr.setDate(dates.endDate, false);
+                    else endInput.value = dates.endDate;
+                }
             };
-            // Kezdeti kitöltés
+            // Kezdeti kitöltés (Flatpickr még nem fut, value set elég)
             updatePicker();
 
             picker.querySelector('.wiz-year-dec')?.addEventListener('click', () => {
@@ -502,6 +531,9 @@ class TimelineApp {
         document.getElementById('wizard-create-btn')?.addEventListener('click', () => {
             this.createSemesterFromWizard();
         });
+
+        // Flatpickr inicializálás a wizard dátummezőire (az updatePicker() után)
+        this.initDatePickers(document.getElementById('semester-wizard'));
     }
 
     createSemesterFromWizard() {
