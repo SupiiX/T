@@ -549,7 +549,7 @@ class TimelineApp {
                 <input type="color" class="wiz-cat-color" value="#6366f1">
                 <input type="text" class="wiz-cat-name" placeholder="Magyar név">
                 <input type="text" class="wiz-cat-nameEn" placeholder="English name">
-                <button class="btn btn-secondary btn-del-cat" style="flex-shrink:0">✕</button>
+                <button class="btn btn-secondary btn-del-cat" aria-label="Sor törlése">${Icons.X}</button>
             `;
             row.querySelector('.btn-del-cat').addEventListener('click', () => row.remove());
             list.appendChild(row);

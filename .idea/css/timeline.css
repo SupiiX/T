@@ -36,9 +36,9 @@
     height: 20px;
     border-radius: 50%;
     border: 3px solid white;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     z-index: 1;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .timeline-item:hover .timeline-dot {
@@ -56,25 +56,21 @@
     background: white;
     border-radius: var(--radius-lg);
     border-left: 3px solid var(--cat-color, var(--color-gray-300));
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
     padding: 0.875rem var(--spacing-md);
-    transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease, border-left-width 0.15s ease;
+    transition: box-shadow 0.15s, background-color 0.15s;
 }
 
 .timeline-item:hover .timeline-card {
-    box-shadow: 0 4px 14px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
-    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
 .timeline-item.active .timeline-card {
     border-left-width: 4px;
     background: color-mix(in srgb, var(--cat-color, var(--color-primary)) 5%, white);
-    outline: 2px solid var(--cat-color, var(--color-primary));
+    outline: 2px solid color-mix(in srgb, var(--cat-color, var(--color-primary)) 40%, transparent);
     outline-offset: 2px;
-    box-shadow:
-        0 6px 20px color-mix(in srgb, var(--cat-color, var(--color-primary)) 22%, transparent),
-        0 2px 6px rgba(0,0,0,0.07);
-    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
 }
 
 /* ── Card header ──────────────────────────────────── */
@@ -113,33 +109,31 @@
 .timeline-edit-indicator {
     display: inline-flex;
     align-items: center;
-    padding: 0.15rem 0.5rem;
+    padding: 0.125rem 0.5rem;
     border-radius: var(--radius-full);
-    font-size: 0.62rem;
+    font-size: 0.625rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     white-space: nowrap;
-    background: var(--cat-color, var(--color-primary));
+    background: color-mix(in srgb, var(--cat-color, var(--color-primary)) 75%, #000);
     color: white;
-    opacity: 0.75;
 }
 
 /* ── Category badge ───────────────────────────────── */
 .timeline-category-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.22rem 0.65rem;
+    padding: 0.25rem 0.625rem;
     border-radius: var(--radius-full);
     font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     white-space: nowrap;
     flex-shrink: 0;
     background: var(--cat-color, var(--color-primary));
     color: white;
-    opacity: 0.92;
 }
 
 /* ── Details ──────────────────────────────────────── */

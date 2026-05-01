@@ -155,10 +155,10 @@ export class UIManager {
         const hasUrl = !!existingUrl;
         return `
       <div id="cloud-settings-modal" class="wizard-overlay">
-        <div class="wizard-box" style="width:460px">
+        <div class="wizard-box wizard-box--narrow">
           <div class="wizard-header">
             <h2>Felhő kapcsolat beállítása</h2>
-            <button id="cloud-modal-close" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
+            <button id="cloud-modal-close" class="btn btn-ghost icon-only" aria-label="Bezárás">${Icons.X}</button>
           </div>
           <div class="wizard-body">
             <div class="form-field">
@@ -167,15 +167,15 @@ export class UIManager {
                 <input type="password" id="cloud-url-input"
                        value="${this.escapeHtml(existingUrl)}"
                        placeholder="https://script.google.com/macros/s/…">
-                <button id="cloud-url-toggle" class="btn btn-secondary" type="button" aria-label="Megjelenítés/elrejtés">👁</button>
+                <button id="cloud-url-toggle" class="btn btn-ghost icon-only" type="button" aria-label="Megjelenítés/elrejtés">${Icons.Eye}</button>
               </div>
             </div>
           </div>
-          <div class="wizard-footer" style="justify-content:space-between">
+          <div class="wizard-footer wizard-footer--split">
             <div>
               ${hasUrl ? `<button id="cloud-modal-delete" class="btn btn-danger">Kapcsolat törlése</button>` : ''}
             </div>
-            <div style="display:flex;gap:0.5rem">
+            <div class="wizard-footer-actions">
               <button id="cloud-modal-cancel" class="btn btn-secondary">Mégse</button>
               <button id="cloud-modal-save" class="btn btn-primary">${Icons.Save} Mentés</button>
             </div>
@@ -413,7 +413,7 @@ export class UIManager {
         <div class="cat-card-top">
           <input type="color" class="cat-color cat-color-swatch" value="${cat.color}" title="Szín">
           <span class="cat-card-name">${this.escapeHtml(cat.name)}</span>
-          <button class="btn-del-cat" title="Törlés">✕</button>
+          <button class="btn-del-cat" title="Törlés" aria-label="Kategória törlése">${Icons.X}</button>
         </div>
         <div class="cat-card-fields">
           <div class="form-row">
@@ -448,7 +448,7 @@ export class UIManager {
         ` : `
           <div id="category-list">${cards}</div>
         `}
-        <button id="add-category-btn" class="btn btn-secondary btn-block" style="margin-top:0.5rem">
+        <button id="add-category-btn" class="btn btn-secondary btn-block">
           + Új kategória
         </button>
       </div>
@@ -543,11 +543,11 @@ export class UIManager {
                 <div class="sem-row-actions">
                   <span class="status-badge status-${s.status}">${this.statusLabel(s.status)}</span>
                   ${s.sheet !== current
-                      ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
+                      ? `<button class="btn btn-ghost btn-sm sem-load-btn" data-sheet="${s.sheet}">Betölt</button>`
                       : `<span class="sem-row-active-label">Aktív szerkesztés</span>`
                   }
                   ${s.status !== 'active'
-                      ? `<button class="btn btn-danger-ghost sem-delete-btn" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}" title="Félév törlése" style="font-size:0.78rem;padding:0.25rem 0.5rem">${Icons.Trash2}</button>`
+                      ? `<button class="btn btn-danger-ghost btn-sm sem-delete-btn" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}" title="Félév törlése" aria-label="Félév törlése">${Icons.Trash2}</button>`
                       : ''
                   }
                 </div>
@@ -555,21 +555,21 @@ export class UIManager {
 
         return `
       <div id="semester-manager-modal" class="wizard-overlay">
-        <div class="wizard-box" style="width:540px">
+        <div class="wizard-box wizard-box--wide">
           <div class="wizard-header">
             <h2>Félévek kezelése</h2>
             <span class="sem-slot-counter ${atLimit ? 'sem-slot-full' : ''}">${list.length} / ${MAX_SEMESTERS}</span>
-            <button id="sem-manager-close" class="btn btn-ghost icon-only" style="padding:0.3rem">✕</button>
+            <button id="sem-manager-close" class="btn btn-ghost icon-only" aria-label="Bezárás">${Icons.X}</button>
           </div>
-          <div class="wizard-body" style="padding:0">
+          <div class="wizard-body wizard-body--flush">
             <div class="sem-manager-list">${rows}</div>
             ${atLimit ? `<p class="sem-limit-hint">Maximum ${MAX_SEMESTERS} félév tárolható (múlt · jelen · jövő). Törölj egy archivált félévet, hogy újat hozhass létre.</p>` : ''}
           </div>
-          <div class="wizard-footer" style="justify-content:space-between">
-            <div style="font-size:0.75rem;color:var(--color-gray-400)">
+          <div class="wizard-footer wizard-footer--split">
+            <div class="wizard-footer-info">
               ${hasCloud ? `${list.length} félév a felhőben` : 'Felhő nincs csatlakoztatva'}
             </div>
-            <div style="display:flex;gap:0.5rem">
+            <div class="wizard-footer-actions">
               <button id="sem-manager-close2" class="btn btn-ghost">Bezár</button>
               <button id="sem-manager-new-btn" class="btn btn-primary" ${atLimit ? 'disabled title="Maximum 3 félév tárolható"' : ''}>
                 ${Icons.FilePlus} Új félév
@@ -583,19 +583,19 @@ export class UIManager {
     renderSemesterDeleteConfirm(semName) {
         return `
       <div id="sem-delete-modal" class="wizard-overlay">
-        <div class="wizard-box" style="width:420px">
+        <div class="wizard-box wizard-box--narrow">
           <div class="wizard-header">
             <h2>Félév törlése</h2>
           </div>
           <div class="wizard-body">
-            <p style="margin-bottom:1rem">Ez a művelet <strong>nem visszavonható</strong>. A felhőből is törlődik a félév minden adata.</p>
-            <p style="margin-bottom:1rem">Megerősítéshez írd be a félév nevét:</p>
-            <p style="font-weight:600;margin-bottom:0.75rem;color:var(--color-gray-200)">${this.escapeHtml(semName)}</p>
+            <p class="sem-delete-warning">Ez a művelet <strong>nem visszavonható</strong>. A felhőből is törlődik a félév minden adata.</p>
+            <p class="sem-delete-prompt">Megerősítéshez írd be a félév nevét:</p>
+            <p class="sem-delete-name">${this.escapeHtml(semName)}</p>
             <div class="form-field">
               <input type="text" id="sem-delete-confirm-input" placeholder="Félév neve" autocomplete="off">
             </div>
           </div>
-          <div class="wizard-footer" style="justify-content:flex-end;gap:0.5rem">
+          <div class="wizard-footer wizard-footer--end">
             <button id="sem-delete-cancel" class="btn btn-ghost">Mégse</button>
             <button id="sem-delete-confirm-btn" class="btn btn-danger" disabled>${Icons.Trash2} Törlés</button>
           </div>
@@ -615,7 +615,7 @@ export class UIManager {
         <div class="wizard-box">
           <div class="wizard-header">
             <h2>Új félév létrehozása</h2>
-            <button id="wizard-close-btn" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
+            <button id="wizard-close-btn" class="btn btn-ghost icon-only" aria-label="Bezárás">${Icons.X}</button>
           </div>
           <div class="wizard-body">
             <p class="wizard-section-title">Félév kiválasztása</p>
@@ -633,7 +633,7 @@ export class UIManager {
                 Azonosító: <code class="wiz-name-code">${defaultName}</code>
               </div>
             </div>
-            <div class="form-field" style="margin-top:var(--spacing-md)">
+            <div class="form-field wiz-date-section">
               <label>Kezdő dátum</label>
               <input type="text" id="wiz-startDate" data-datepicker placeholder="éééé-hh-nn" autocomplete="off">
             </div>
@@ -657,12 +657,12 @@ export class UIManager {
                   <button class="btn btn-secondary btn-del-cat" style="flex-shrink:0">✕</button>
                 </div>`).join('')}
             </div>
-            <button id="wizard-add-cat-btn" class="btn btn-secondary" style="width:100%;margin-top:0.25rem">
+            <button id="wizard-add-cat-btn" class="btn btn-secondary">
               + Kategória hozzáadása
             </button>
           </div>
           <div class="wizard-footer">
-            <button id="wizard-create-btn" class="btn btn-primary" style="flex:1">
+            <button id="wizard-create-btn" class="btn btn-primary">
               ${Icons.Save} Félév létrehozása
             </button>
             <button id="wizard-cancel-btn" class="btn btn-secondary">Mégse</button>
