@@ -73,6 +73,7 @@ export class AppState {
         this.data.semester = jsonData.semester || null;
         this.data.categories = jsonData.categories || [];
         this.data.events = jsonData.events || [];
+        this.data.form = this.getEmptyForm();
         this.notify('data-loaded');
     }
 

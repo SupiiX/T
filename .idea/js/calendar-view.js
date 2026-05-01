@@ -100,6 +100,12 @@ export class CalendarView {
             date: newDate,
             endDate: newEndDate
         });
+
+        // Keep the open form in sync if this event is currently being edited
+        if (this.state.data.form.id === Number(ev.id)) {
+            this.state.updateFormField('date', newDate);
+            this.state.updateFormField('endDate', newEndDate || '');
+        }
     }
 
     destroy() {

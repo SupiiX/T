@@ -79,6 +79,9 @@ class TimelineApp {
         if (key === 'categories') {
             this.ui.renderSidebar();
             this.rebindEvents();
+            if (this.state.data.events.length > 0) {
+                this.switchView(this.state.data.currentView);
+            }
             return;
         }
         if (key === 'data-loaded' || key === 'events') {
@@ -318,7 +321,13 @@ class TimelineApp {
 
             bindField('.cat-name', 'name');
             bindField('.cat-nameEn', 'nameEn');
-            bindField('.cat-color', 'color');
+            // Color uses 'change' (fires on picker close) + notifying update so views refresh
+            const colorEl = row.querySelector('.cat-color');
+            if (colorEl) {
+                colorEl.addEventListener('change', (e) => {
+                    this.state.updateCategory(catId, { color: e.target.value });
+                });
+            }
             bindField('.cat-hu-only', 'hungarianOnly', true);
             bindField('.cat-en-only', 'englishOnly', true);
 
@@ -455,6 +464,16 @@ class TimelineApp {
     }
 
     openNewSemesterWizard() {
+        const list = this.state.data.semesterList;
+        if (list.length >= 3) {
+            showToast('Maximum 3 félév tárolható (előző · jelenlegi · következő). Törölj egy archivált félévet!', 'warning', 5000);
+            return;
+        }
+        const hasDraft = list.some(s => computeSemesterStatus(s) === 'draft');
+        if (hasDraft) {
+            showToast('Már van egy tervezett félév. Előbb töröld azt, mielőtt újat hozol létre!', 'warning', 5000);
+            return;
+        }
         document.getElementById('semester-wizard')?.remove();
         document.body.insertAdjacentHTML('beforeend', this.ui.renderNewSemesterWizard());
         this.bindWizardEvents();
@@ -561,6 +580,17 @@ class TimelineApp {
         const alreadyExists = this.state.data.semesterList.some(s => s.sheet === sheetName);
         if (alreadyExists) {
             showToast(`A(z) ${name} félév már létezik!`, 'warning');
+            return;
+        }
+
+        // Max 3 félév, max 1 tervezett (draft)
+        if (this.state.data.semesterList.length >= 3) {
+            showToast('Maximum 3 félév tárolható egyszerre!', 'warning');
+            return;
+        }
+        const hasDraft = this.state.data.semesterList.some(s => computeSemesterStatus(s) === 'draft');
+        if (hasDraft) {
+            showToast('Már van egy tervezett félév!', 'warning');
             return;
         }
 
@@ -686,7 +716,8 @@ class TimelineApp {
             const cat = categoryMap[ev.category];
             const color = cat?.color || '#6366f1';
             const highlightedTitle = this.highlightMatch(ev.title, query);
-            const dateMeta = formatDateShort(ev.date) + (cat ? ` · ${cat.name}` : '');
+            const safeCatName = cat ? cat.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+            const dateMeta = formatDateShort(ev.date) + (cat ? ` · ${safeCatName}` : '');
             return `
               <div class="search-result-item" data-event-id="${ev.id}">
                 <span class="search-result-dot" style="background:${color}"></span>
@@ -706,8 +737,9 @@ class TimelineApp {
 
     highlightMatch(text, query) {
         if (!text) return '';
+        const safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+        return safe.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
     }
 
     selectSearchResult(ev) {
@@ -948,6 +980,11 @@ class TimelineApp {
         }));
         if (this.state.data.semester) {
             this.state.data.semester.status = computeSemesterStatus(this.state.data.semester);
+        }
+        // Notify so the header re-renders with the newly computed statuses
+        this.state.notify('semesterList');
+        if (this.state.data.semester) {
+            this.state.notify('semester');
         }
     }
 
