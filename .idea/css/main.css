@@ -152,11 +152,11 @@ body {
 .btn-danger-ghost {
     background: transparent;
     color: var(--color-danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(214, 57, 76, 0.2);
 }
 
 .btn-danger-ghost:hover:not(:disabled) {
-    background: #fef2f2;
+    background: color-mix(in srgb, var(--color-danger) 6%, white);
     border-color: var(--color-danger);
 }
 
