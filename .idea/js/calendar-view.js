@@ -50,8 +50,8 @@ export class CalendarView {
                 title: ev.title,
                 start: ev.date,
                 end: ev.endDate ? inclusiveToExclusive(ev.endDate) : undefined,
-                backgroundColor: cat?.color || '#6366f1',
-                borderColor: cat?.color || '#6366f1',
+                backgroundColor: cat?.color || '#1099b3',
+                borderColor: cat?.color || '#1099b3',
                 textColor: '#ffffff',
                 extendedProps: {
                     category: ev.category,

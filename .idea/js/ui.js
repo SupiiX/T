@@ -651,7 +651,7 @@ export class UIManager {
             <div id="wizard-cat-list">
               ${this.state.data.categories.map(cat => `
                 <div class="wizard-cat-row">
-                  <input type="color" class="wiz-cat-color" value="${cat.color || '#6366f1'}">
+                  <input type="color" class="wiz-cat-color" value="${cat.color || '#1099b3'}">
                   <input type="text" class="wiz-cat-name" placeholder="Magyar név" value="${this.escapeHtml(cat.name || '')}">
                   <input type="text" class="wiz-cat-nameEn" placeholder="English name" value="${this.escapeHtml(cat.nameEn || '')}">
                   <button class="btn btn-secondary btn-del-cat" style="flex-shrink:0">✕</button>

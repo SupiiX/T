@@ -546,7 +546,7 @@ class TimelineApp {
             const row = document.createElement('div');
             row.className = 'wizard-cat-row';
             row.innerHTML = `
-                <input type="color" class="wiz-cat-color" value="#6366f1">
+                <input type="color" class="wiz-cat-color" value="#1099b3">
                 <input type="text" class="wiz-cat-name" placeholder="Magyar név">
                 <input type="text" class="wiz-cat-nameEn" placeholder="English name">
                 <button class="btn btn-secondary btn-del-cat" aria-label="Sor törlése">${Icons.X}</button>
@@ -612,7 +612,7 @@ class TimelineApp {
                 id:     String(i + 1),
                 name:   catName,
                 nameEn: row.querySelector('.wiz-cat-nameEn')?.value.trim() || '',
-                color:  row.querySelector('.wiz-cat-color')?.value || '#6366f1'
+                color:  row.querySelector('.wiz-cat-color')?.value || '#1099b3'
             });
         });
 
@@ -714,7 +714,7 @@ class TimelineApp {
 
         dropdown.innerHTML = results.map(ev => {
             const cat = categoryMap[ev.category];
-            const color = cat?.color || '#6366f1';
+            const color = cat?.color || '#1099b3';
             const highlightedTitle = this.highlightMatch(ev.title, query);
             const safeCatName = cat ? cat.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
             const dateMeta = formatDateShort(ev.date) + (cat ? ` · ${safeCatName}` : '');

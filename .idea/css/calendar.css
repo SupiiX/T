@@ -17,7 +17,7 @@
 }
 
 .fc-button {
-    background: var(--color-primary) !important;
+    background: var(--color-primary-dark) !important;
     border: none !important;
     border-radius: var(--radius-md) !important;
     padding: 0.5rem 0.75rem !important;
@@ -26,11 +26,11 @@
 }
 
 .fc-button:hover {
-    background: var(--color-primary-hover) !important;
+    background: var(--color-brand) !important;
 }
 
 .fc-button:focus {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(16, 153, 179, 0.15) !important;
 }
 
 .fc-event {
@@ -59,5 +59,5 @@
 }
 
 .fc-daygrid-day.fc-day-today {
-    background: rgba(79, 70, 229, 0.05) !important;
+    background: rgba(16, 153, 179, 0.06) !important;
 }

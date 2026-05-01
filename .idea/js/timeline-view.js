@@ -35,7 +35,7 @@ export class TimelineView {
     renderEventCard(ev) {
         const categoryMap = this.state.getCategoryMap();
         const cat = categoryMap[ev.category];
-        const color = cat?.color || '#6366f1';
+        const color = cat?.color || '#1099b3';
         const isActive = this.state.data.form.id === ev.id;
 
         return `

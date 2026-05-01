@@ -79,7 +79,7 @@
 }
 
 .tab-context.context-new {
-    background: rgba(79, 70, 229, 0.03);
+    background: rgba(16, 153, 179, 0.04);
 }
 
 .context-title {
@@ -106,8 +106,8 @@
 }
 
 .badge-new {
-    background: rgba(79, 70, 229, 0.1);
-    color: var(--color-primary);
+    background: rgba(16, 153, 179, 0.1);
+    color: var(--color-primary-dark);
 }
 
 .badge-edit {
@@ -264,7 +264,7 @@
 .sidebar-body .form-field textarea:focus {
     background: white;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.12);
+    box-shadow: 0 0 0 2.5px rgba(16, 153, 179, 0.15);
 }
 
 .sidebar-body .form-field input::placeholder {
