@@ -1,4 +1,4 @@
-/* ── Timeline view ──────────────────────────────────────── */
+/* Timeline view styles */
 
 #timeline-container {
     height: 100%;
@@ -8,134 +8,151 @@
 
 .timeline {
     position: relative;
-    max-width: 760px;
+    max-width: 800px;
     margin: 0 auto;
-    padding-left: 32px;
 }
 
-/* Függőleges vonal */
 .timeline-line {
     position: absolute;
-    left: 7px;
-    top: 6px;
+    left: 10px;
+    top: 0;
     bottom: 0;
-    width: 1px;
-    background: var(--color-gray-200);
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-gray-200), var(--color-gray-100));
 }
 
-/* ── Timeline item ──────────────────────────────────────── */
 .timeline-item {
     position: relative;
-    margin-bottom: 0.875rem;
+    padding-left: 40px;
+    margin-bottom: 1.25rem;
     cursor: pointer;
 }
 
-/* Jelölő pont */
 .timeline-dot {
     position: absolute;
-    left: -28px;
-    top: 12px;
-    width: 12px;
-    height: 12px;
+    left: 0;
+    top: 10px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    border: 2px solid white;
-    outline: 2px solid var(--color-gray-200);
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1;
-    transition: outline-color 0.12s;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .timeline-item:hover .timeline-dot {
-    outline-color: var(--cat-color, var(--color-gray-400));
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.15);
 }
 
 .timeline-item.active .timeline-dot {
-    outline-color: var(--cat-color, var(--color-primary));
-    outline-width: 2px;
+    transform: scale(1.2);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat-color, var(--color-primary)) 25%, transparent);
 }
 
-/* ── Kártya ─────────────────────────────────────────────── */
+/* ── Card ─────────────────────────────────────────── */
 .timeline-card {
     background: white;
-    border: 1px solid var(--color-gray-200);
-    border-left: 4px solid var(--cat-color, var(--color-gray-200));
-    padding: 0.75rem 0.875rem;
-    transition: border-color 0.12s, background 0.12s;
+    border-radius: var(--radius-lg);
+    border-left: 3px solid var(--cat-color, var(--color-gray-300));
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    padding: 0.875rem var(--spacing-md);
+    transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease, border-left-width 0.15s ease;
 }
 
 .timeline-item:hover .timeline-card {
-    border-color: var(--color-gray-300);
-    border-left-color: var(--cat-color, var(--color-gray-400));
+    box-shadow: 0 4px 14px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
 }
 
 .timeline-item.active .timeline-card {
-    background: var(--color-gray-50);
-    border-color: var(--color-gray-300);
-    border-left-color: var(--cat-color, var(--color-primary));
     border-left-width: 4px;
+    background: color-mix(in srgb, var(--cat-color, var(--color-primary)) 5%, white);
+    outline: 2px solid var(--cat-color, var(--color-primary));
+    outline-offset: 2px;
+    box-shadow:
+        0 6px 20px color-mix(in srgb, var(--cat-color, var(--color-primary)) 22%, transparent),
+        0 2px 6px rgba(0,0,0,0.07);
+    transform: translateY(-1px);
 }
 
-/* ── Kártya tartalom ────────────────────────────────────── */
+/* ── Card header ──────────────────────────────────── */
 .timeline-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
+    margin-bottom: 0;
 }
 
 .timeline-card-title h3 {
-    font-size: var(--text-base);
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--color-gray-900);
-    line-height: 1.35;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.2rem;
+    line-height: 1.4;
 }
 
 .timeline-card-date {
-    font-size: var(--text-xs);
+    font-size: 0.72rem;
     color: var(--color-gray-400);
     font-weight: 500;
 }
 
-/* ── Badge csoport ──────────────────────────────────────── */
+/* ── Badge group ──────────────────────────────────── */
 .timeline-card-badges {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0.25rem;
+    gap: 0.3rem;
     flex-shrink: 0;
 }
 
-/* Szerkesztés jelző — szöveg, háttér nélkül */
+/* ── Edit indicator ───────────────────────────────── */
 .timeline-edit-indicator {
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-gray-400);
-}
-
-/* Kategória badge — csak szöveg, kategória szín */
-.timeline-category-badge {
-    font-size: var(--text-xs);
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--cat-color, var(--color-gray-400));
     white-space: nowrap;
-    flex-shrink: 0;
+    background: var(--cat-color, var(--color-primary));
+    color: white;
+    opacity: 0.75;
 }
 
-/* ── Részletek ──────────────────────────────────────────── */
+/* ── Category badge ───────────────────────────────── */
+.timeline-category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: var(--cat-color, var(--color-primary));
+    color: white;
+    opacity: 0.92;
+}
+
+/* ── Details ──────────────────────────────────────── */
 .timeline-card-details {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
     border-top: 1px solid var(--color-gray-100);
 }
 
 .timeline-description {
-    font-size: var(--text-sm);
+    font-size: 0.8rem;
     color: var(--color-gray-500);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.375rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -147,14 +164,22 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    font-size: var(--text-xs);
+    font-size: 0.72rem;
     color: var(--color-gray-400);
     font-weight: 500;
 }
 
-/* ── Mobile ─────────────────────────────────────────────── */
+/* ── Mobile ───────────────────────────────────────── */
 @media (max-width: 768px) {
-    #timeline-container { padding: var(--spacing-md); }
+    #timeline-container {
+        padding: var(--spacing-md);
+    }
 
-    .timeline-card-title h3 { font-size: var(--text-sm); }
+    .timeline-card {
+        padding: 0.75rem var(--spacing-sm);
+    }
+
+    .timeline-card-title h3 {
+        font-size: 0.85rem;
+    }
 }
