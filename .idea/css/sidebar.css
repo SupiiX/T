@@ -25,7 +25,7 @@
     justify-content: center;
     gap: 0.4rem;
     padding: 0.75rem 0.5rem;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--color-gray-500);
     background: none;
@@ -45,7 +45,7 @@
     color: var(--color-primary);
     border-bottom-color: var(--color-primary);
     background: white;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .tab-count {
@@ -58,7 +58,7 @@
     background: var(--color-primary);
     color: white;
     border-radius: var(--radius-full);
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 700;
     line-height: 1;
 }
@@ -159,9 +159,9 @@
 }
 
 .section-label {
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-gray-400);
     margin-bottom: 0.625rem;
@@ -206,7 +206,7 @@
     font-weight: 500;
     border-radius: var(--radius-full);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
     line-height: 1;
 }
 
@@ -221,8 +221,7 @@
 }
 
 .category-btn:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
+    opacity: 0.9;
 }
 
 /* ── Event form ─────────────────────────────────────── */
@@ -243,11 +242,11 @@
 }
 
 .sidebar-body .form-field label {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--color-gray-400);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    text-transform: none;
     margin-bottom: 0.2rem;
 }
 
