@@ -112,38 +112,30 @@ export class UIManager {
           </div>
         </div>
         <div class="header-right">
-          <div class="header-btn-group">
-            <button id="semester-manager-btn" class="btn btn-ghost" aria-label="Félévek kezelése">
-              ${Icons.CalendarDays}
-              <span>Félévek</span>
-            </button>
-          </div>
-          <div class="header-divider"></div>
-          <div class="header-btn-group">
-            <button id="upload-btn" class="btn btn-ghost icon-only" aria-label="JSON fájl betöltése" title="JSON fájl betöltése">
-              ${Icons.Upload}
-            </button>
-            <button id="download-btn" class="btn btn-ghost icon-only" aria-label="JSON letöltése" title="JSON letöltése" ${!hasEvents ? 'disabled' : ''}>
-              ${Icons.Download}
-            </button>
-          </div>
+          <button id="upload-btn" class="btn btn-ghost icon-only" aria-label="JSON fájl betöltése" title="JSON fájl betöltése">
+            ${Icons.Upload}
+          </button>
+          <button id="download-btn" class="btn btn-ghost icon-only" aria-label="JSON letöltése" title="JSON letöltése" ${!hasEvents ? 'disabled' : ''}>
+            ${Icons.Download}
+          </button>
+          <button id="semester-manager-btn" class="btn btn-ghost icon-only" aria-label="Félévek kezelése" title="Félévek kezelése">
+            ${Icons.CalendarDays}
+          </button>
           <div class="header-divider"></div>
           ${hasCloud ? `
-          <div class="header-btn-group">
             <button id="cloud-settings-btn" class="btn btn-ghost icon-only" aria-label="Felhő beállítása" title="Felhő beállítása">
               ${Icons.Settings}
             </button>
-            <button id="cloud-load-btn" class="btn btn-ghost" aria-label="Betöltés felhőből">
-              ${Icons.CloudDownload} <span>Betöltés</span>
+            <button id="cloud-load-btn" class="btn btn-ghost icon-only" aria-label="Betöltés felhőből" title="Betöltés felhőből">
+              ${Icons.CloudDownload}
             </button>
-            <button id="cloud-save-btn" class="btn btn-primary" aria-label="Mentés felhőbe">
-              ${Icons.CloudUpload} <span>Mentés</span>
+            <button id="cloud-save-btn" class="btn btn-primary icon-only" aria-label="Mentés felhőbe" title="Mentés felhőbe">
+              ${Icons.CloudUpload}
             </button>
-          </div>
           ` : `
-          <button id="cloud-settings-btn" class="btn btn-ghost" aria-label="Felhő csatlakoztatása">
-            ${Icons.Cloud} <span>Felhő csatlakoztatása</span>
-          </button>
+            <button id="cloud-settings-btn" class="btn btn-ghost icon-only" aria-label="Felhő csatlakoztatása" title="Felhő csatlakoztatása">
+              ${Icons.Cloud}
+            </button>
           `}
         </div>
       </header>
@@ -211,6 +203,11 @@ export class UIManager {
     renderEventTab() {
         const isEditing = this.state.data.form.id !== null;
         const form = this.state.data.form;
+        const isIdle = !isEditing && !form.title && !form.date;
+
+        if (isIdle && this.state.data.events.length > 0) {
+            return this.renderSidebarIdle();
+        }
 
         return `
       <div class="tab-context ${isEditing ? 'context-edit' : 'context-new'}">
@@ -239,6 +236,52 @@ export class UIManager {
             </button>
           </div>
         </div>
+      </div>
+    `;
+    }
+
+    renderSidebarIdle() {
+        const sem = this.state.data.semester;
+        const events = this.state.data.events;
+        const today = new Date().toISOString().slice(0, 10);
+        const upcoming = events
+            .filter(e => e.date >= today)
+            .sort((a, b) => a.date.localeCompare(b.date))[0];
+
+        const formatDate = (d) => {
+            if (!d) return '–';
+            const [, m, day] = d.split('-');
+            const months = ['jan.', 'febr.', 'márc.', 'ápr.', 'máj.', 'jún.', 'júl.', 'aug.', 'szept.', 'okt.', 'nov.', 'dec.'];
+            return `${months[parseInt(m) - 1]} ${parseInt(day)}.`;
+        };
+
+        return `
+      <div class="sidebar-idle">
+        ${sem ? `
+          <div class="sidebar-idle-sem">
+            <span class="idle-sem-label">Aktív félév</span>
+            <span class="idle-sem-name">${this.escapeHtml(sem.name || '')}</span>
+            ${sem.startDate && sem.endDate ? `<span class="idle-sem-dates">${sem.startDate} – ${sem.endDate}</span>` : ''}
+          </div>
+          <div class="sidebar-idle-stats">
+            <div class="idle-stat">
+              <span class="idle-stat-num">${events.length}</span>
+              <span class="idle-stat-label">esemény</span>
+            </div>
+            <div class="idle-stat">
+              <span class="idle-stat-num">${this.state.data.categories.length}</span>
+              <span class="idle-stat-label">kategória</span>
+            </div>
+          </div>
+          ${upcoming ? `
+            <div class="sidebar-idle-next">
+              <span class="idle-next-label">Következő esemény</span>
+              <span class="idle-next-title">${this.escapeHtml(upcoming.title)}</span>
+              <span class="idle-next-date">${formatDate(upcoming.date)}</span>
+            </div>
+          ` : ''}
+        ` : ''}
+        <p class="sidebar-idle-hint">Kattints egy eseményre a szerkesztéshez, vagy a naptárra új esemény létrehozásához.</p>
       </div>
     `;
     }
