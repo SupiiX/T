@@ -113,7 +113,7 @@ export class UIManager {
         </div>
         <div class="header-right">
           <button id="new-event-btn" class="btn btn-primary" aria-label="Új esemény">
-            ${Icons.FilePlus}<span>Új esemény</span>
+            ${Icons.Plus}<span>Új esemény</span>
           </button>
           <div class="header-divider"></div>
           <div class="header-btn-group">
@@ -130,7 +130,7 @@ export class UIManager {
           </div>
           <div class="header-divider"></div>
           <button id="cloud-logout-btn" class="btn btn-ghost" aria-label="Kijelentkezés" title="Kijelentkezés">
-            ${Icons.LogOut ?? Icons.X}<span class="hide-sm">Kilépés</span>
+            ${Icons.LogOut}<span class="hide-sm">Kilépés</span>
           </button>
         </div>
       </header>
