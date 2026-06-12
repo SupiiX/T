@@ -608,4 +608,25 @@
         max-width: 100vw;
         border-left: none;
     }
+
+    /* 16px input → nincs iOS auto-zoom fókuszkor, és nagyobb tapintási felület */
+    .sidebar-body input,
+    .sidebar-body textarea,
+    .sidebar-body select,
+    .login-input {
+        font-size: 16px;
+        padding: 0.6rem 0.7rem;
+    }
+
+    /* Kezdés/Vége és HU/EN mezők egymás alá (ne legyenek szűkek) */
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Kényelmesebb tapintási méret a kategória-chipeknek és kapcsolónak */
+    .category-btn {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.85rem;
+    }
 }

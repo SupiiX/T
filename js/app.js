@@ -178,7 +178,7 @@ class TimelineApp {
                 locale: 'hu',
                 dateFormat: 'Y-m-d',
                 allowInput: true,
-                disableMobile: true,
+                disableMobile: false,   // mobilon a kényelmes natív (telefonos) dátumválasztó
                 // Mentés a state-be: az onChange a change eseményen át megy,
                 // amit a bindFormInputs / bindSemesterInputs 'input' hallgatója fog
                 onChange: (_dates, dateStr) => {
