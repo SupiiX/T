@@ -937,7 +937,7 @@ class TimelineApp {
         const lo = document.getElementById('cloud-logout-btn');
         if (lo && !lo.dataset.bound) {
             lo.dataset.bound = '1';
-            lo.addEventListener('click', () => this.logout());
+            lo.addEventListener('click', () => this.confirmLogout());
         }
     }
 
@@ -1000,6 +1000,22 @@ class TimelineApp {
         this.state.loadSemesterList([]);
         this.state.loadData({ events: [], categories: [], semester: null });
         this.showLoginOverlay();
+    }
+
+    // Kijelentkezés megerősítő ablak (mobilra is optimalizált modál)
+    confirmLogout() {
+        document.getElementById('logout-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', this.ui.renderLogoutConfirm());
+        const close = () => document.getElementById('logout-modal')?.remove();
+        document.getElementById('logout-cancel')?.addEventListener('click', close);
+        document.getElementById('logout-cancel-x')?.addEventListener('click', close);
+        document.getElementById('logout-modal')?.addEventListener('click', e => {
+            if (e.target.id === 'logout-modal') close();
+        });
+        document.getElementById('logout-confirm')?.addEventListener('click', () => {
+            close();
+            this.logout();
+        });
     }
 
     // ── Belépés utáni betöltés ─────────────────────────────

@@ -246,7 +246,9 @@
         display: none;
     }
 
-    .btn span {
+    /* Csak a FEJLÉC gombjainál rejtjük a feliratot (helytakarékosság),
+       a panel Mentés/Mégse gombjain marad a szöveg. */
+    .app-header .btn span {
         display: none;
     }
 

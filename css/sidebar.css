@@ -609,8 +609,9 @@
         border-left: none;
     }
 
-    /* 16px input → nincs iOS auto-zoom fókuszkor, és nagyobb tapintási felület */
-    .sidebar-body input,
+    /* 16px input → nincs iOS auto-zoom fókuszkor, és nagyobb tapintási felület.
+       A színválasztót (type=color) KIHAGYJUK, hogy ne nyomja össze a padding. */
+    .sidebar-body input:not([type="color"]):not([type="checkbox"]),
     .sidebar-body textarea,
     .sidebar-body select,
     .login-input {
@@ -638,5 +639,11 @@
     /* A panel fejléce a felső biztonságos terület alatt */
     .panel-head {
         padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    }
+
+    /* Nagyobb, egyértelmű Mentés/Mégse gombok mobilon (felirattal együtt) */
+    .panel-foot .btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
     }
 }

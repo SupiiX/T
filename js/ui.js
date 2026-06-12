@@ -212,7 +212,7 @@ export class UIManager {
             </button>
           ` : ''}
           <button id="clear-btn" class="btn btn-ghost ${isEditing ? '' : 'btn-block'}">
-            ${Icons.FilePlus} <span>Mégse / Új</span>
+            ${Icons.X} <span>Mégse</span>
           </button>
         </div>
       </div>
@@ -579,6 +579,25 @@ export class UIManager {
           <div class="wizard-footer" style="justify-content:flex-end;gap:0.5rem">
             <button id="sem-delete-cancel" class="btn btn-ghost">Mégse</button>
             <button id="sem-delete-confirm-btn" class="btn btn-danger" disabled>${Icons.Trash2} Törlés</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    renderLogoutConfirm() {
+        return `
+      <div id="logout-modal" class="wizard-overlay">
+        <div class="wizard-box" style="width:380px">
+          <div class="wizard-header">
+            <h2>Kijelentkezés</h2>
+            <button id="logout-cancel-x" class="modal-close" aria-label="Bezárás">${Icons.X}</button>
+          </div>
+          <div class="wizard-body">
+            <p style="color:var(--color-gray-600);line-height:1.55">Biztosan ki szeretnél lépni a szerkesztőből?</p>
+          </div>
+          <div class="wizard-footer" style="justify-content:flex-end;gap:0.5rem">
+            <button id="logout-cancel" class="btn btn-ghost">Mégse</button>
+            <button id="logout-confirm" class="btn btn-danger">${Icons.LogOut}<span>Kilépés</span></button>
           </div>
         </div>
       </div>`;
