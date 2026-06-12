@@ -629,4 +629,14 @@
         padding: 0.5rem 0.85rem;
         font-size: 0.85rem;
     }
+
+    /* A Mentés/Mégse kerülje el a telefon alsó „home" csíkját (notch/safe-area) */
+    .panel-foot {
+        padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* A panel fejléce a felső biztonságos terület alatt */
+    .panel-head {
+        padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    }
 }

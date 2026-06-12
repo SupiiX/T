@@ -73,3 +73,39 @@
 .fc-daygrid-day.fc-day-today {
     background: color-mix(in srgb, var(--color-primary) 7%, transparent) !important;
 }
+
+/* ── Naptár mobilon ───────────────────────────────────── */
+@media (max-width: 768px) {
+    #calendar-container {
+        padding: var(--spacing-sm);
+    }
+
+    /* Fejléc: cím külön sorba a navigáció fölé, tisztább */
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column-reverse;
+        gap: 0.6rem;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1rem !important;
+    }
+
+    /* Nagyobb tap-felület a ‹ › ma gomboknak */
+    .fc-button {
+        padding: 0.5rem 0.8rem !important;
+    }
+
+    .fc-col-header-cell {
+        font-size: 0.6rem !important;
+    }
+
+    .fc-daygrid-day-number {
+        font-size: 0.72rem !important;
+    }
+
+    .fc-event {
+        font-size: 0.6rem !important;
+        padding: 1px 3px !important;
+    }
+}
