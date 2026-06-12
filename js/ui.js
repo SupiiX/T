@@ -24,7 +24,8 @@ export class UIManager {
                 }
                 break;
             case 'form':
-                if (data.form.id !== null) {
+                // Esemény-megnyitás (kiválasztás vagy dátumra kattintás) → Esemény mód
+                if (data.form.id !== null || data.form.date) {
                     this.activeTab = 'event';
                 }
                 this.renderSidebar();
@@ -93,7 +94,6 @@ export class UIManager {
     }
 
     renderHeader() {
-        const hasCloud = !!localStorage.getItem('calendar_script_url');
         const hasEvents = this.state.data.events.length > 0;
         return `
       <header class="app-header">
@@ -112,39 +112,26 @@ export class UIManager {
           </div>
         </div>
         <div class="header-right">
-          <div class="header-btn-group">
-            <button id="semester-manager-btn" class="btn btn-ghost" aria-label="Félévek kezelése">
-              ${Icons.CalendarDays}
-              <span>Félévek</span>
-            </button>
-          </div>
+          <button id="new-event-btn" class="btn btn-primary" aria-label="Új esemény">
+            ${Icons.FilePlus}<span>Új esemény</span>
+          </button>
           <div class="header-divider"></div>
           <div class="header-btn-group">
-            <button id="upload-btn" class="btn btn-ghost icon-only" aria-label="JSON fájl betöltése" title="JSON fájl betöltése">
-              ${Icons.Upload}
+            <button id="semester-manager-btn" class="btn btn-ghost" aria-label="Félévek kezelése" title="Félévek">
+              ${Icons.CalendarDays}
+              <span class="hide-sm">Félévek</span>
             </button>
-            <button id="download-btn" class="btn btn-ghost icon-only" aria-label="JSON letöltése" title="JSON letöltése" ${!hasEvents ? 'disabled' : ''}>
+            <button id="settings-btn" class="btn btn-ghost icon-only" aria-label="Beállítások" title="Félév és kategóriák">
+              ${Icons.Settings}
+            </button>
+            <button id="download-btn" class="btn btn-ghost icon-only" aria-label="Naptár letöltése JSON-ként" title="Naptár letöltése JSON-ként (biztonsági mentés)" ${!hasEvents ? 'disabled' : ''}>
               ${Icons.Download}
             </button>
           </div>
           <div class="header-divider"></div>
-          ${hasCloud ? `
-          <div class="header-btn-group">
-            <button id="cloud-settings-btn" class="btn btn-ghost icon-only" aria-label="Felhő beállítása" title="Felhő beállítása">
-              ${Icons.Settings}
-            </button>
-            <button id="cloud-load-btn" class="btn btn-ghost" aria-label="Betöltés felhőből">
-              ${Icons.CloudDownload} <span>Betöltés</span>
-            </button>
-            <button id="cloud-save-btn" class="btn btn-primary" aria-label="Mentés felhőbe">
-              ${Icons.CloudUpload} <span>Mentés</span>
-            </button>
-          </div>
-          ` : `
-          <button id="cloud-settings-btn" class="btn btn-ghost" aria-label="Felhő csatlakoztatása">
-            ${Icons.Cloud} <span>Felhő csatlakoztatása</span>
+          <button id="cloud-logout-btn" class="btn btn-ghost" aria-label="Kijelentkezés" title="Kijelentkezés">
+            ${Icons.LogOut ?? Icons.X}<span class="hide-sm">Kilépés</span>
           </button>
-          `}
         </div>
       </header>
     `;
@@ -190,14 +177,12 @@ export class UIManager {
         const catCount = this.state.data.categories.length;
 
         const content = `
-      <nav class="sidebar-tabs">
-        <button class="sidebar-tab ${this.activeTab === 'event' ? 'active' : ''}" data-tab="event">
-          Esemény
-        </button>
-        <button class="sidebar-tab ${this.activeTab === 'settings' ? 'active' : ''}" data-tab="settings">
-          Adatok${catCount > 0 ? `<span class="tab-count">${catCount}</span>` : ''}
-        </button>
-      </nav>
+      <div class="panel-head">
+        <span class="panel-head-title">${this.activeTab === 'settings'
+            ? 'Félév és kategóriák'
+            : (this.state.data.form.id !== null ? 'Esemény szerkesztése' : 'Új esemény')}</span>
+        <button id="panel-close" class="btn btn-ghost icon-only" aria-label="Bezárás">${Icons.X}</button>
+      </div>
       ${this.activeTab === 'event' ? this.renderEventTab() : this.renderSettingsTab()}
     `;
 
@@ -210,34 +195,25 @@ export class UIManager {
 
     renderEventTab() {
         const isEditing = this.state.data.form.id !== null;
-        const form = this.state.data.form;
 
         return `
-      <div class="tab-context ${isEditing ? 'context-edit' : 'context-new'}">
-        <span class="sidebar-badge ${isEditing ? 'badge-edit' : 'badge-new'}">
-          ${isEditing ? 'Szerkesztés' : 'Új esemény'}
-        </span>
-        ${isEditing ? `<span class="context-title">${this.escapeHtml(form.title || 'Névtelen esemény')}</span>` : ''}
-      </div>
-
       <div class="sidebar-body">
         ${this.renderFormFields()}
-
-        <div class="form-actions">
-          <button id="save-btn" class="btn btn-primary btn-block">
-            ${Icons.Save}
-            <span>${isEditing ? 'Frissítés' : 'Mentés'}</span>
-          </button>
-          <div class="form-actions-row">
-            ${isEditing ? `
-              <button id="delete-btn" class="btn btn-danger-ghost">
-                ${Icons.Trash2} <span>Törlés</span>
-              </button>
-            ` : ''}
-            <button id="clear-btn" class="btn btn-ghost ${isEditing ? '' : 'btn-block'}">
-              ${Icons.FilePlus} <span>Mégse / Új</span>
+      </div>
+      <div class="panel-foot">
+        <button id="save-btn" class="btn btn-primary btn-block">
+          ${Icons.Save}
+          <span>${isEditing ? 'Frissítés' : 'Mentés'}</span>
+        </button>
+        <div class="form-actions-row">
+          ${isEditing ? `
+            <button id="delete-btn" class="btn btn-danger-ghost">
+              ${Icons.Trash2} <span>Törlés</span>
             </button>
-          </div>
+          ` : ''}
+          <button id="clear-btn" class="btn btn-ghost ${isEditing ? '' : 'btn-block'}">
+            ${Icons.FilePlus} <span>Mégse / Új</span>
+          </button>
         </div>
       </div>
     `;
@@ -302,7 +278,7 @@ export class UIManager {
         </div>
       </div>
 
-      ${this.renderBilingualFields()}
+      ${form.hungarianOnly ? '' : this.renderBilingualFields()}
     `;
     }
 
@@ -398,7 +374,7 @@ export class UIManager {
           <label>Státusz</label>
           <div class="sem-status-auto">
             <span class="status-badge status-${status}">${this.statusLabel(status)}</span>
-            <span class="sem-status-auto-hint">automatikusan számított</span>
+            <span class="sem-status-auto-hint">a Félévek kezelőben állítható</span>
           </div>
         </div>
       </div>
@@ -521,7 +497,7 @@ export class UIManager {
     renderSemesterManagerModal() {
         const list = this.state.data.semesterList;
         const current = this.state.data.activeSemesterSheet;
-        const hasCloud = !!localStorage.getItem('calendar_script_url');
+        const hasCloud = true;  // Firebase: bejelentkezve mindig csatlakozva
         const MAX_SEMESTERS = 3;
         const atLimit = list.length >= MAX_SEMESTERS;
 
@@ -544,7 +520,11 @@ export class UIManager {
                   <span class="status-badge status-${s.status}">${this.statusLabel(s.status)}</span>
                   ${s.sheet !== current
                       ? `<button class="btn btn-ghost sem-load-btn" data-sheet="${s.sheet}" style="font-size:0.78rem;padding:0.25rem 0.6rem">Betölt</button>`
-                      : `<span class="sem-row-active-label">Aktív szerkesztés</span>`
+                      : `<span class="sem-row-active-label">Szerkesztés alatt</span>`
+                  }
+                  ${s.status === 'active'
+                      ? `<button class="btn btn-ghost sem-status-btn" data-sheet="${s.sheet}" data-action="archive" style="font-size:0.78rem;padding:0.25rem 0.6rem">Archiválás</button>`
+                      : `<button class="btn btn-ghost sem-status-btn" data-sheet="${s.sheet}" data-action="activate" style="font-size:0.78rem;padding:0.25rem 0.6rem">Aktiválás</button>`
                   }
                   ${s.status !== 'active'
                       ? `<button class="btn btn-danger-ghost sem-delete-btn" data-sheet="${s.sheet}" data-name="${this.escapeHtml(s.name)}" title="Félév törlése" style="font-size:0.78rem;padding:0.25rem 0.5rem">${Icons.Trash2}</button>`
@@ -559,7 +539,7 @@ export class UIManager {
           <div class="wizard-header">
             <h2>Félévek kezelése</h2>
             <span class="sem-slot-counter ${atLimit ? 'sem-slot-full' : ''}">${list.length} / ${MAX_SEMESTERS}</span>
-            <button id="sem-manager-close" class="btn btn-ghost icon-only" style="padding:0.3rem">✕</button>
+            <button id="sem-manager-close" class="modal-close" aria-label="Bezárás">${Icons.X}</button>
           </div>
           <div class="wizard-body" style="padding:0">
             <div class="sem-manager-list">${rows}</div>
@@ -586,11 +566,12 @@ export class UIManager {
         <div class="wizard-box" style="width:420px">
           <div class="wizard-header">
             <h2>Félév törlése</h2>
+            <button id="sem-delete-x" class="modal-close" aria-label="Bezárás">${Icons.X}</button>
           </div>
           <div class="wizard-body">
             <p style="margin-bottom:1rem">Ez a művelet <strong>nem visszavonható</strong>. A felhőből is törlődik a félév minden adata.</p>
-            <p style="margin-bottom:1rem">Megerősítéshez írd be a félév nevét:</p>
-            <p style="font-weight:600;margin-bottom:0.75rem;color:var(--color-gray-200)">${this.escapeHtml(semName)}</p>
+            <p style="margin-bottom:0.6rem">Megerősítéshez írd be a félév nevét:</p>
+            <p style="font-weight:600;margin-bottom:0.85rem;color:var(--color-gray-900);background:var(--color-gray-50);border:1px solid var(--color-gray-200);border-radius:8px;padding:0.5rem 0.75rem;font-family:ui-monospace,monospace">${this.escapeHtml(semName)}</p>
             <div class="form-field">
               <input type="text" id="sem-delete-confirm-input" placeholder="Félév neve" autocomplete="off">
             </div>
@@ -615,7 +596,7 @@ export class UIManager {
         <div class="wizard-box">
           <div class="wizard-header">
             <h2>Új félév létrehozása</h2>
-            <button id="wizard-close-btn" class="btn btn-secondary" style="padding:0.25rem 0.5rem">✕</button>
+            <button id="wizard-close-btn" class="modal-close" aria-label="Bezárás">${Icons.X}</button>
           </div>
           <div class="wizard-body">
             <p class="wizard-section-title">Félév kiválasztása</p>
@@ -651,7 +632,7 @@ export class UIManager {
             <div id="wizard-cat-list">
               ${this.state.data.categories.map(cat => `
                 <div class="wizard-cat-row">
-                  <input type="color" class="wiz-cat-color" value="${cat.color || '#6366f1'}">
+                  <input type="color" class="wiz-cat-color" value="${cat.color || '#1099b3'}">
                   <input type="text" class="wiz-cat-name" placeholder="Magyar név" value="${this.escapeHtml(cat.name || '')}">
                   <input type="text" class="wiz-cat-nameEn" placeholder="English name" value="${this.escapeHtml(cat.nameEn || '')}">
                   <button class="btn btn-secondary btn-del-cat" style="flex-shrink:0">✕</button>

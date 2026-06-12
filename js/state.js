@@ -13,6 +13,14 @@ export class AppState {
             currentView: 'calendar'
         };
         this.listeners = [];
+        this._sync = null;   // perzisztencia hook (Firebase) – setSyncHandler állítja be
+    }
+
+    // Perzisztencia hook beállítása (Firebase írások).
+    // op: 'event' | 'deleteEvent' | 'category' | 'deleteCategory' | 'semester'
+    setSyncHandler(fn) { this._sync = fn; }
+    _emit(op, data) {
+        if (this._sync) { try { this._sync(op, data); } catch (e) { console.error('sync hiba:', e); } }
     }
 
     // Observer pattern: subscribe to state changes
@@ -77,40 +85,60 @@ export class AppState {
         this.notify('data-loaded');
     }
 
-    // Add new event with auto-incremented ID
-    addEvent(event) {
-        const maxId = this.data.events.length > 0
-            ? Math.max(...this.data.events.map(e => e.id))
-            : 0;
-        event.id = maxId + 1;
+    // Élő (Firebase) frissítés alkalmazása a szerkesztett űrlap MEGZAVARÁSA nélkül.
+    // Frissíti az adatot és a nézeteket, de NEM vált ki perzisztens írást
+    // (nincs visszhang a felhőbe) és nem rendereli újra a sidebar űrlapot.
+    applyRemote(payload) {
+        this.data.semester   = payload.semester   || null;
+        this.data.categories = payload.categories || [];
+        this.data.events     = payload.events     || [];
+        this.notify('remote');
+    }
+
+    // Add new event. Ha explicitId adott (pl. Firebase számláló), azt használja;
+    // különben helyi auto-increment (offline fallback).
+    addEvent(event, explicitId = null) {
+        if (explicitId !== null && explicitId !== undefined) {
+            event.id = explicitId;
+        } else {
+            const maxId = this.data.events.length > 0
+                ? Math.max(...this.data.events.map(e => Number(e.id) || 0))
+                : 0;
+            event.id = maxId + 1;
+        }
         this.data.events.push(event);
+        this._emit('event', event);
         this.notify('events');
     }
 
     // Update existing event
     updateEvent(id, updatedEvent) {
-        const index = this.data.events.findIndex(e => e.id === id);
+        const index = this.data.events.findIndex(e => Number(e.id) === Number(id));
         if (index !== -1) {
             this.data.events[index] = { ...this.data.events[index], ...updatedEvent };
+            this._emit('event', this.data.events[index]);
             this.notify('events');
         }
     }
 
     // Delete event
     deleteEvent(id) {
-        this.data.events = this.data.events.filter(e => e.id !== id);
+        this.data.events = this.data.events.filter(e => Number(e.id) !== Number(id));
+        this._emit('deleteEvent', id);
         this.notify('events');
     }
 
     // Update semester fields
     updateSemester(fields) {
         this.data.semester = { ...this.data.semester, ...fields };
+        this._emit('semester', this.data.semester);
         this.notify('semester');
     }
 
     // Add a new category
     addCategory(cat) {
         this.data.categories.push(cat);
+        this._emit('category', cat);
         this.notify('categories');
     }
 
@@ -119,6 +147,7 @@ export class AppState {
         const index = this.data.categories.findIndex(c => c.id === id);
         if (index !== -1) {
             this.data.categories[index] = { ...this.data.categories[index], ...fields };
+            this._emit('category', this.data.categories[index]);
             this.notify('categories');
         }
     }
@@ -126,6 +155,7 @@ export class AppState {
     // Delete a category
     deleteCategory(id) {
         this.data.categories = this.data.categories.filter(c => c.id !== id);
+        this._emit('deleteCategory', id);
         this.notify('categories');
     }
 

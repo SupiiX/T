@@ -1,0 +1,250 @@
+{
+  "semesters": {
+    "2026-tavasz": {
+      "meta": {
+        "id": "2026-tavasz",
+        "name": "2026 Tavaszi félév",
+        "nameEn": "2026 Spring Semester",
+        "startDate": "2026-02-01",
+        "endDate": "2026-06-30",
+        "status": "active"
+      },
+      "categories": {
+        "tanulmanyi": {
+          "name": "Tanulmányi",
+          "nameEn": "Academic",
+          "color": "#751101"
+        },
+        "rendezvenyeink": {
+          "name": "Rendezvényeink",
+          "nameEn": "Events",
+          "color": "#025f49"
+        },
+        "hok": {
+          "name": "HÖK",
+          "nameEn": "HÖK",
+          "color": "#b8915d",
+          "hungarianOnly": true
+        },
+        "isc": {
+          "name": "ISC",
+          "nameEn": "ISC",
+          "color": "#1099b3",
+          "englishOnly": true
+        }
+      },
+      "events": {
+        "1": {
+          "title": "Végleges tárgyfelvétel",
+          "titleEn": "Final Subject Registration",
+          "date": "2026-02-09",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "2": {
+          "title": "Regisztrációs időszak",
+          "titleEn": "Registration Period",
+          "date": "2026-02-09",
+          "endDate": "2026-02-22",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "3": {
+          "title": "Szorgalmi időszak",
+          "titleEn": "Study Period",
+          "date": "2026-02-16",
+          "endDate": "2026-05-24",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "4": {
+          "title": "Intenzív hét",
+          "titleEn": "Intensive Week",
+          "date": "2026-03-30",
+          "endDate": "2026-04-02",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "5": {
+          "title": "Tavaszi szünet",
+          "titleEn": "Spring Break",
+          "date": "2026-04-03",
+          "endDate": "2026-04-10",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "6": {
+          "title": "Szakdolgozat leadása",
+          "titleEn": "Thesis Submission",
+          "date": "2026-05-04",
+          "endDate": "2026-05-15",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "7": {
+          "title": "Specializáció választás",
+          "titleEn": "Specialization Selection",
+          "date": "2026-05-18",
+          "endDate": "2026-05-22",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "8": {
+          "title": "Vizsgaidőszak",
+          "titleEn": "Exam Period",
+          "date": "2026-05-25",
+          "endDate": "2026-06-20",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "9": {
+          "title": "Záróvizsga-időszak",
+          "titleEn": "Final Exam Period",
+          "date": "2026-06-15",
+          "endDate": "2026-06-24",
+          "category": "tanulmanyi",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Neptun",
+          "locationEn": "Neptun"
+        },
+        "10": {
+          "title": "Kitelepülés",
+          "titleEn": " - ",
+          "date": "2026-02-16",
+          "endDate": "2026-02-18",
+          "category": "hok",
+          "hungarianOnly": true,
+          "description": "",
+          "descriptionEn": "",
+          "location": "Corvinus",
+          "locationEn": ""
+        },
+        "11": {
+          "title": "Infoest",
+          "titleEn": " - ",
+          "date": "2026-02-23",
+          "category": "hok",
+          "hungarianOnly": true,
+          "description": "",
+          "descriptionEn": "",
+          "location": "Corvinus",
+          "locationEn": "Corvinus",
+          "link": "https://www.facebook.com/events/2785581868461640?acontext=%7B%22event_action_history%22%3A[%7B%22surface%22%3A%22search%22%7D%2C%7B%22mechanism%22%3A%22attachment%22%2C%22surface%22%3A%22newsfeed%22%7D]%2C%22ref_notif_type%22%3Anull%7D&locale=hu_HU"
+        },
+        "12": {
+          "title": "AC interjúk hete",
+          "titleEn": " - ",
+          "date": "2026-03-09",
+          "endDate": "2026-03-13",
+          "category": "hok",
+          "hungarianOnly": true,
+          "description": "",
+          "descriptionEn": "",
+          "location": "Corvinus",
+          "locationEn": "Corvinus"
+        },
+        "13": {
+          "title": "Daytime Pop-up Party",
+          "titleEn": "Daytime Pop-up Party",
+          "date": "2026-02-18",
+          "category": "rendezvenyeink",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Corvinus C épülete előtt",
+          "locationEn": "In front of Corvinus Building C",
+          "link": "https://www.facebook.com/events/2655838414782774?acontext=%7B%22event_action_history%22%3A[%7B%22mechanism%22%3A%22attachment%22%2C%22surface%22%3A%22newsfeed%22%7D]%2C%22ref_notif_type%22%3Anull%7D&locale=hu_HU"
+        },
+        "14": {
+          "title": "Season Opening - Maroni",
+          "titleEn": "Season Opening - Maroni",
+          "date": "2026-02-19",
+          "category": "rendezvenyeink",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Maroni Budapest",
+          "locationEn": "Maroni Budapest",
+          "link": "https://www.facebook.com/events/1210945730519075?acontext=%7B%22event_action_history%22%3A[%7B%22mechanism%22%3A%22attachment%22%2C%22surface%22%3A%22newsfeed%22%7D]%2C%22ref_notif_type%22%3Anull%7D&locale=hu_HU"
+        },
+        "15": {
+          "title": "Kocsmatúra",
+          "titleEn": "Kocsmatúra",
+          "date": "2026-02-26",
+          "category": "rendezvenyeink",
+          "hungarianOnly": true,
+          "description": "",
+          "descriptionEn": "",
+          "location": "Fővám tér",
+          "locationEn": "Fővám tér",
+          "link": "https://www.facebook.com/events/838405259252941?acontext=%7B%22event_action_history%22%3A[%7B%22mechanism%22%3A%22attachment%22%2C%22surface%22%3A%22newsfeed%22%7D]%2C%22ref_notif_type%22%3Anull%7D&locale=hu_HU"
+        },
+        "16": {
+          "title": "Közgáz & Friends - Members Only, Dojo",
+          "titleEn": "Közgáz & Friends - Members Only, Dojo",
+          "date": "2026-03-19",
+          "category": "rendezvenyeink",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Dojo Club",
+          "locationEn": "Dojo Club",
+          "link": "https://www.facebook.com/events/1241596167473250?acontext=%7B%22event_action_history%22%3A[%7B%22mechanism%22%3A%22attachment%22%2C%22surface%22%3A%22newsfeed%22%7D]%2C%22ref_notif_type%22%3Anull%7D&locale=hu_HU"
+        },
+        "17": {
+          "title": "Sporthét",
+          "titleEn": "Sport Week",
+          "date": "2026-04-01",
+          "category": "rendezvenyeink",
+          "description": "TBA",
+          "descriptionEn": "TBA",
+          "location": "",
+          "locationEn": ""
+        },
+        "20": {
+          "title": "ISC  Event",
+          "titleEn": "ISC  Event",
+          "date": "2026-02-20",
+          "category": "isc",
+          "description": "",
+          "descriptionEn": "Event for international students hosted by the International Student Club.",
+          "location": "Corvinus",
+          "locationEn": "Corvinus"
+        },
+        "21": {
+          "title": "ISC Night",
+          "titleEn": "ISC  Night",
+          "date": "2026-03-25",
+          "category": "isc",
+          "description": "",
+          "descriptionEn": "",
+          "location": "Corvinus",
+          "locationEn": "Corvinus"
+        }
+      },
+      "_counter": 21
+    }
+  }
+}

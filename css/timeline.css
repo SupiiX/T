@@ -1,0 +1,194 @@
+/* Timeline view – modern, hónapokra bontott kártyás lista */
+
+#timeline-container {
+    height: 100%;
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+}
+
+.timeline {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+/* ── Hónap fejléc ─────────────────────────────────── */
+.timeline-month {
+    font-size: 0.69rem;
+    font-weight: 600;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 1.4rem 0.15rem 0.55rem;
+}
+
+.timeline-month:first-child {
+    margin-top: 0.15rem;
+}
+
+/* ── Esemény kártya ───────────────────────────────── */
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 11px;
+    padding: 13px 15px 13px 18px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.timeline-item:hover {
+    border-color: var(--color-gray-300);
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+}
+
+.tl-accent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--cat, var(--color-primary));
+}
+
+/* Dátum oszlop */
+.tl-date {
+    min-width: 38px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.tl-day {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.tl-mon {
+    display: block;
+    font-size: 0.62rem;
+    color: var(--color-gray-400);
+    margin-top: 2px;
+}
+
+/* Törzs */
+.tl-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.tl-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tl-title-text {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    line-height: 1.35;
+}
+
+.tl-next {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 12%, white);
+    border-radius: 5px;
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+
+.tl-meta {
+    font-size: 0.72rem;
+    color: var(--color-gray-500);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tl-loc {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.tl-loc svg {
+    width: 12px;
+    height: 12px;
+}
+
+.tl-dot {
+    color: var(--color-gray-300);
+}
+
+.tl-desc {
+    font-size: 0.75rem;
+    color: var(--color-gray-500);
+    margin-top: 4px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Kategória chip */
+.tl-chip {
+    flex-shrink: 0;
+    font-size: 0.69rem;
+    font-weight: 500;
+    padding: 4px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    background: color-mix(in srgb, var(--cat, var(--color-primary)) 12%, white);
+    color: var(--cat, var(--color-primary));
+}
+
+/* ── Következő esemény kiemelés ───────────────────── */
+.timeline-item.is-next {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 4%, white);
+}
+
+.timeline-item.is-next .tl-accent {
+    background: var(--color-primary);
+}
+
+.timeline-item.is-next .tl-day {
+    color: var(--color-primary);
+}
+
+/* ── Szerkesztés alatt ────────────────────────────── */
+.timeline-item.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+/* ── Mobil ────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #timeline-container {
+        padding: var(--spacing-md);
+    }
+
+    .timeline-item {
+        gap: 11px;
+        padding: 12px 13px 12px 15px;
+    }
+
+    .tl-chip {
+        display: none;
+    }
+}

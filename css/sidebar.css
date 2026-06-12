@@ -1,13 +1,52 @@
 /* Sidebar */
 
 .sidebar {
-    width: var(--sidebar-width);
-    flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100dvh;
+    width: 380px;
+    max-width: 92vw;
     background: white;
-    border-right: 1px solid var(--color-gray-200);
+    border-left: 1px solid var(--color-gray-200);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 36px -14px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+/* Panel fejléc (cím + bezárás) */
+.panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem 0.6rem;
+    flex-shrink: 0;
+}
+
+.panel-head-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    letter-spacing: -0.01em;
+}
+
+/* Rögzített panel-lábléc (a törzs görgethető, a gombok mindig láthatók) */
+.panel-foot {
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-gray-200);
+    padding: 0.85rem 1rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 /* ── Tab navigation ─────────────────────────────────── */
@@ -79,7 +118,7 @@
 }
 
 .tab-context.context-new {
-    background: rgba(79, 70, 229, 0.03);
+    background: color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
 .context-title {
@@ -106,7 +145,7 @@
 }
 
 .badge-new {
-    background: rgba(79, 70, 229, 0.1);
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
     color: var(--color-primary);
 }
 
@@ -117,11 +156,14 @@
 
 /* ── Sidebar body (scrollable) ──────────────────────── */
 .sidebar-body {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 0;            /* a flex-magasság a görgéshez kell, nem a tartalom diktálja */
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
+    padding-bottom: 3rem;
+    display: block;
 }
 
 .settings-body {
@@ -264,7 +306,7 @@
 .sidebar-body .form-field textarea:focus {
     background: white;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.12);
+    box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 
 .sidebar-body .form-field input::placeholder {
@@ -559,24 +601,11 @@
     margin-bottom: 0;
 }
 
-/* ── Mobile ─────────────────────────────────────────── */
+/* ── Mobil: teljes szélességű csúszópanel ───────────── */
 @media (max-width: 768px) {
     .sidebar {
-        position: fixed;
-        left: 0;
-        top: 60px;
-        height: calc(100dvh - 60px);
-        width: 88%;
-        max-width: 380px;
-        z-index: 200;
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
-        box-shadow: none;
-        border-right: none;
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        width: 100vw;
+        max-width: 100vw;
+        border-left: none;
     }
 }

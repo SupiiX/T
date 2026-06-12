@@ -1,23 +1,29 @@
 /* Main styles with CSS variables */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Colors */
-    --color-primary: #3f51b5;
-    --color-primary-hover: #33429a;
-    --color-success: #10b981;
-    --color-success-hover: #059669;
-    --color-danger: #ef4444;
-    --color-danger-hover: #dc2626;
-    --color-gray-50: #f7f7f5;
-    --color-gray-100: #efefec;
-    --color-gray-200: #dfdfdb;
-    --color-gray-300: #c8c8c2;
-    --color-gray-400: #989892;
-    --color-gray-500: #6f6f69;
-    --color-gray-600: #565650;
-    --color-gray-700: #3f3f3a;
-    --color-gray-800: #292925;
-    --color-gray-900: #171715;
+    /* Colors – modern app: semleges hűvös szürke + egyetlen teal akcent */
+    --color-primary: #0e7c86;          /* teal – fő akcent / CTA */
+    --color-primary-hover: #0b6770;
+    --color-brand: #14272b;            /* mély teal-szürke – belépő háttér */
+    --color-brand-hover: #0e1c1f;
+    --color-accent: #0e7c86;
+    --color-gold: #bf8f55;
+    --color-success: #16a34a;
+    --color-success-hover: #15803d;
+    --color-danger: #e5484d;
+    --color-danger-hover: #c93c41;
+    /* Hűvös semleges szürkeskála (Inter + neutral) */
+    --color-gray-50: #f7f8f9;
+    --color-gray-100: #eceef1;
+    --color-gray-200: #e1e4e8;
+    --color-gray-300: #cbd0d6;
+    --color-gray-400: #9aa0a6;
+    --color-gray-500: #697077;
+    --color-gray-600: #4a5057;
+    --color-gray-700: #353a40;
+    --color-gray-800: #24282d;
+    --color-gray-900: #16181b;
 
     /* Layout */
     --sidebar-width: 350px;
@@ -47,7 +53,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 15px;
     line-height: 1.55;
     color: var(--color-gray-800);
@@ -186,7 +192,7 @@ body {
 .form-field select:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
 }
 
 /* SVG icons */
@@ -279,18 +285,20 @@ svg {
     display: none;
 }
 
-/* Sidebar backdrop (mobile) */
+/* Csúszópanel háttér */
 .sidebar-backdrop {
-    display: none;
     position: fixed;
     inset: 0;
-    top: 60px;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 199;
+    background: rgba(16, 24, 28, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.26s ease;
+    z-index: 1050;
 }
 
 .sidebar-backdrop.visible {
-    display: block;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* ── Loading overlay ──────────────────────────────── */
@@ -330,22 +338,53 @@ svg {
 .wizard-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(16, 24, 28, 0.45);
+    backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: var(--spacing-md);
 }
 
 .wizard-box {
     background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 24px 60px -16px rgba(16, 24, 28, 0.42);
     width: 520px;
     max-width: 95vw;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+/* Letisztult modál-bezáró gomb */
+.modal-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.modal-close:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+.modal-close svg {
+    width: 18px;
+    height: 18px;
 }
 
 .wizard-header {
@@ -358,8 +397,9 @@ svg {
 }
 
 .wizard-header h2 {
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     color: var(--color-gray-900);
 }
 
@@ -590,7 +630,7 @@ svg {
 .toast-success { border-left-color: #10b981; }
 .toast-error   { border-left-color: #ef4444; }
 .toast-warning { border-left-color: #f59e0b; }
-.toast-info    { border-left-color: #6366f1; }
+.toast-info    { border-left-color: var(--color-accent); }
 
 .toast-icon {
     flex-shrink: 0;
@@ -730,4 +770,72 @@ span.flatpickr-weekday {
 /* Az input stílusa Flatpickr után is egységes marad */
 input[data-datepicker] {
     cursor: pointer;
+}
+
+/* ── Belépő képernyő (közös jelszó) ───────────────────────── */
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--color-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: var(--spacing-md);
+}
+.login-box {
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2.25rem;
+    text-align: center;
+    box-shadow: 0 18px 48px -12px rgba(1, 26, 36, 0.45);
+}
+.login-logo {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto var(--spacing-md);
+    border-radius: 15px;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-logo svg { width: 27px; height: 27px; color: #ffffff; }
+.login-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-brand);
+    margin-bottom: 0.35rem;
+}
+.login-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    margin-bottom: 1.75rem;
+}
+.login-input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-gray-50);
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    margin-bottom: 0.85rem;
+}
+.login-input:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+.login-box .btn-primary { width: 100%; padding: 0.7rem; font-weight: 600; }
+.login-error {
+    color: var(--color-danger);
+    font-size: 0.82rem;
+    min-height: 1.1em;
+    margin-top: 0.75rem;
 }

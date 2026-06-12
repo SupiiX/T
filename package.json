@@ -1,10 +1,7 @@
 {
-  "name": "T",
+  "name": "hok-naptar-kezelo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "private": true
+  "description": "HÖK eseménynaptár szerkesztő – statikus webalkalmazás Firebase Realtime Database backenddel.",
+  "private": true,
+  "homepage": "index.html"
 }

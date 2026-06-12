@@ -6,7 +6,7 @@
     justify-content: space-between;
     padding: 0 var(--spacing-lg);
     height: 56px;
-    background: white;
+    background: #ffffff;
     border-bottom: 1px solid var(--color-gray-200);
     flex-shrink: 0;
 }
@@ -17,10 +17,20 @@
     gap: var(--spacing-md);
 }
 
+.header-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .header-logo svg {
-    width: 28px;
-    height: 28px;
-    color: var(--color-primary);
+    width: 19px;
+    height: 19px;
+    color: #ffffff;
 }
 
 /* ── Státusz badge ───────────────────────────────────── */
@@ -61,10 +71,11 @@
 }
 
 .sem-switcher-name {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: var(--color-gray-900);
     line-height: 1;
+    letter-spacing: -0.01em;
 }
 
 .semester-switcher-btn {
@@ -80,7 +91,7 @@
 }
 
 .semester-switcher-btn:hover {
-    background: var(--color-gray-50);
+    background: var(--color-gray-100);
 }
 
 .semester-switcher-btn svg {
@@ -181,9 +192,10 @@
 }
 
 .app-header h1 {
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 600;
     color: var(--color-gray-900);
+    letter-spacing: -0.01em;
 }
 
 .semester-name {
@@ -253,6 +265,24 @@
     .header-divider {
         display: none;
     }
+
+    /* Mobil: tisztább, kompaktabb fejléc */
+    #mobile-sidebar-btn,
+    #download-btn {
+        display: none;
+    }
+
+    .header-left {
+        min-width: 0;
+        flex-shrink: 1;
+    }
+
+    .sem-switcher-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 40vw;
+    }
 }
 
 /* ── Esemény kereső ─────────────────────────────────── */
@@ -286,13 +316,14 @@
     background: var(--color-gray-50);
     color: var(--color-gray-800);
     outline: none;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
 }
 
 .header-search-input:focus {
     border-color: var(--color-primary);
-    background: white;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
 }
 
 .header-search-input::placeholder {
@@ -374,9 +405,7 @@
 
 @media (max-width: 768px) {
     .header-center {
-        flex: 1;
-        max-width: none;
-        margin: 0 var(--spacing-sm);
+        display: none;
     }
 }
 
@@ -502,4 +531,14 @@
 .sem-delete-btn:hover {
     opacity: 1;
     background: color-mix(in srgb, var(--color-danger, #ef4444) 10%, transparent);
+}
+
+/* ── Fejléc ghost gombok (világos sáv) ── */
+.app-header .btn-ghost {
+    color: var(--color-gray-600);
+}
+
+.app-header .btn-ghost:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-900);
 }

@@ -1,11 +1,12 @@
-// Event CRUD operations
+// Event CRUD operations (Firebase: az új esemény id-ja a számlálóból jön)
 
 export class EventManager {
-    constructor(state) {
+    constructor(state, app = null) {
         this.state = state;
+        this.app = app;   // hozzáférés a Firebase-réteghez és az aktív félévhez
     }
 
-    saveEvent() {
+    async saveEvent() {
         const form = this.state.data.form;
 
         // Validation
@@ -39,8 +40,9 @@ export class EventManager {
             });
             window.showToast('Esemény módosítva!', 'success');
         } else {
-            // Create new event
-            this.state.addEvent({
+            // Create new event – az id-t lehetőleg a Firebase atomi számlálójából
+            // kérjük, hogy két szerkesztő egyszerre se kaphassa ugyanazt.
+            const newEvent = {
                 title: form.title,
                 titleEn: form.titleEn || '',
                 date: form.date,
@@ -52,7 +54,14 @@ export class EventManager {
                 locationEn: form.locationEn || '',
                 link: form.link || null,
                 hungarianOnly: form.hungarianOnly || undefined
-            });
+            };
+            let explicitId = null;
+            const sheet = this.app && this.app.activeSheet && this.app.activeSheet();
+            if (this.app && this.app.fb && sheet) {
+                try { explicitId = await this.app.fb.nextId(sheet); }
+                catch (e) { console.error('Id-foglalás hiba:', e); }
+            }
+            this.state.addEvent(newEvent, explicitId);
             window.showToast('Esemény hozzáadva!', 'success');
         }
 
@@ -72,5 +81,7 @@ export class EventManager {
 
     clearForm() {
         this.state.resetForm();
+        // Csúszópanel bezárása (mentés / törlés / mégse után)
+        if (this.app && this.app.closePanel) this.app.closePanel();
     }
 }

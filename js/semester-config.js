@@ -50,21 +50,11 @@ export function getDefaultDates(year, semNum) {
 export function computeSemesterStatus(sem) {
     if (!sem) return 'draft';
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const start = sem.startDate ? new Date(sem.startDate + 'T00:00:00') : null;
-    const end   = sem.endDate   ? new Date(sem.endDate   + 'T00:00:00') : null;
-
-    if (start && end) {
-        if (today < start) return 'draft';
-        if (today > end)   return 'archived';
-        return 'active';
+    // KÉZI vezérlés: a státusz TÁROLT érték, nem a dátumokból számolódik
+    // (a dátumok csak információ). A felülbírálás mező elsőbbséget élvez,
+    // különben a tárolt status, alapértelmezésben 'draft' (tervezett).
+    if (sem.statusOverride === 'archived' || sem.statusOverride === 'active' || sem.statusOverride === 'draft') {
+        return sem.statusOverride;
     }
-
-    if (start && !end) return today >= start ? 'active' : 'draft';
-    if (!start && end) return today <= end   ? 'active' : 'archived';
-
-    // Nincs dátum – visszaesés a tárolt státuszra
     return sem.status || 'draft';
 }
