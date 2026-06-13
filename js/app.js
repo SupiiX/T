@@ -961,8 +961,8 @@ class TimelineApp {
         el.innerHTML = `
           <div class="login-box">
             <div class="login-logo">${Icons.CalendarDays}</div>
-            <h1 class="login-title">HÖK Naptár</h1>
-            <p class="login-subtitle">Add meg a közös szerkesztői jelszót</p>
+            <h1 class="login-title">HÖK Calendar Editor</h1>
+            <p class="login-subtitle">Add meg a jelszót</p>
             <input type="password" id="login-password" class="login-input" placeholder="Jelszó" autocomplete="current-password">
             <button id="login-btn" class="btn btn-primary btn-block">Belépés</button>
             <p class="login-error"></p>
