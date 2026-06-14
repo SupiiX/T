@@ -89,7 +89,7 @@ export class TimelineView {
             ? `<div class="tl-desc">${this.escapeHtml(ev.description)}</div>` : '';
 
         return `
-      <div id="event-${ev.id}" class="timeline-item ${isNext ? 'is-next' : ''} ${isActive ? 'active' : ''}"
+      <div id="event-${ev.id}" class="timeline-item ${isActive ? 'active' : ''}"
            data-event-id="${ev.id}" style="--cat: ${color}">
         <span class="tl-accent"></span>
         <div class="tl-date">
@@ -99,7 +99,6 @@ export class TimelineView {
         <div class="tl-body">
           <div class="tl-title">
             <span class="tl-title-text">${this.escapeHtml(ev.title)}</span>
-            ${isNext ? `<span class="tl-next">Következő</span>` : ''}
           </div>
           ${meta}
           ${desc}

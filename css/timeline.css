@@ -171,10 +171,10 @@
     color: var(--color-primary);
 }
 
-/* ── Szerkesztés alatt ────────────────────────────── */
+/* ── Szerkesztés alatt (kijelölve) → a kategória színe a keret ── */
 .timeline-item.active {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    border-color: var(--cat, var(--color-primary));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--cat, var(--color-primary)) 30%, transparent);
 }
 
 /* ── Mobil ────────────────────────────────────────── */
