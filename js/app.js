@@ -71,6 +71,19 @@ class TimelineApp {
             if (!e.target.closest('.header-search-wrapper')) this.closeSearchDropdown();
             if (!e.target.closest('.semester-switcher')) this.closeSemesterDropdown();
         });
+        // Esc: először a felül lévő modalt zárja, ha nincs, akkor a csúszópanelt
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            // Ha input mezőben vagyunk, a mező saját Esc-kezelése (pl. kereső) fusson le
+            const overlays = document.querySelectorAll('.wizard-overlay');
+            if (overlays.length > 0) {
+                overlays[overlays.length - 1].remove();
+                return;
+            }
+            if (document.querySelector('.sidebar.open')) {
+                this.eventManager.clearForm();
+            }
+        });
         this.initAuth();
     }
 
@@ -372,10 +385,16 @@ class TimelineApp {
             const delBtn = row.querySelector('.btn-del-cat');
             if (delBtn) {
                 delBtn.addEventListener('click', () => {
-                    if (!confirm('Biztosan törölni szeretnéd ezt a kategóriát?')) return;
-                    this.state.deleteCategory(catId);
-                    this.ui.renderSidebar();
-                    this.rebindEvents();
+                    this.openConfirm({
+                        title: 'Kategória törlése',
+                        message: 'Biztosan törölni szeretnéd ezt a kategóriát?',
+                        confirmLabel: 'Törlés',
+                        onConfirm: () => {
+                            this.state.deleteCategory(catId);
+                            this.ui.renderSidebar();
+                            this.rebindEvents();
+                        }
+                    });
                 });
             }
         });
@@ -508,6 +527,28 @@ class TimelineApp {
         showToast(`Félév ${label}.`, 'success');
         this.rerenderHeader();
         this.openSemesterManager();
+    }
+
+    // Generikus megerősítő dialógus (natív confirm() kiváltása).
+    // Használat: this.openConfirm({ title, message, confirmLabel, onConfirm })
+    openConfirm({ title, message, confirmLabel, onConfirm }) {
+        document.getElementById('app-confirm-modal')?.remove();
+        document.body.insertAdjacentHTML(
+            'beforeend',
+            this.ui.renderConfirmModal({ title, message, confirmLabel })
+        );
+
+        const close = () => document.getElementById('app-confirm-modal')?.remove();
+
+        document.getElementById('app-confirm-cancel')?.addEventListener('click', close);
+        document.getElementById('app-confirm-x')?.addEventListener('click', close);
+        document.getElementById('app-confirm-modal')?.addEventListener('click', e => {
+            if (e.target.id === 'app-confirm-modal') close();
+        });
+        document.getElementById('app-confirm-ok')?.addEventListener('click', () => {
+            close();
+            onConfirm();
+        });
     }
 
     openSemesterDeleteConfirm(sheet, semName) {

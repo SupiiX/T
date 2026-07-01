@@ -1,5 +1,20 @@
 // Date utility functions
 
+// Dátum -> "YYYY-MM-DD" a LOKÁLIS naptári nap szerint.
+// FONTOS: nem toISOString()-et használunk, mert az UTC-re vált,
+// és UTC+1/+2-ben (Magyarország) éjfélnél egy nappal visszacsúszna a dátum.
+export function toLocalDateStr(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+// Mai nap "YYYY-MM-DD" formában, lokális időzóna szerint
+export function todayStr() {
+    return toLocalDateStr(new Date());
+}
+
 export function formatDate(dateStr) {
     if (!dateStr) return '';
     return dateStr.slice(0, 10);
@@ -32,12 +47,12 @@ export function inclusiveToExclusive(dateStr) {
     if (!dateStr) return undefined;
     const d = new Date(dateStr + 'T00:00:00');
     d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0, 10);
+    return toLocalDateStr(d);
 }
 
 export function exclusiveToInclusive(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr + 'T00:00:00');
     d.setDate(d.getDate() - 1);
-    return d.toISOString().slice(0, 10);
+    return toLocalDateStr(d);
 }

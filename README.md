@@ -1,54 +1,65 @@
-# HÖK Naptár Kezelő
+# HÖK Naptár — használati útmutató
 
-Belső eszköz a HÖK eseménynaptárának szerkesztéséhez. Az adatok a **Firebase**-ben
-élnek, a **HÖK weblap pedig élőben onnan olvassa** az aktív félév eseményeit —
-nincs külön „feltöltés", amit beírsz és mentesz, az hamarosan megjelenik a weblapon is.
+Ezzel a felülettel viszed fel és kezeled a HÖK eseményeit. Amit itt elmentesz, az a
+**közös felhőbe** kerül — a többi szerkesztő rögtön látja. A **nyilvános weboldalra**
+egy külön lépéssel kerül ki (lásd lentebb, „Közzététel").
 
 ## Belépés
 
-Az eszköz egy **közös jelszóval** védett (csak bejelentkezve lehet szerkeszteni,
-olvasni bárki tudja a weblapon). A jelszó a csapat **megosztott jelszó-fájljában**
-van — írd be a belépőképernyőn.
+Nyisd meg az oldalt, és add meg a **közös szerkesztői jelszót** (a csapat megosztott
+jelszó-fájljában megtalálod). Szerkeszteni csak bejelentkezve lehet.
 
-## Esemény felvitele / szerkesztése
+## Esemény felvitele
 
-- **Új esemény**: a fejléc jobb felső **„Új esemény"** gombja, vagy kattints egy
-  napra a naptárban → jobbról bejön a szerkesztő panel.
-- **Meglévő szerkesztése**: kattints az eseményre a naptárban vagy az idővonalon.
-- Add meg a címet, válassz **kategóriát** (= terület), dátumot, helyszínt stb.,
-  majd **Mentés**. A mentés azonnal a felhőbe ír.
-- A **„Csak magyar oldal"** kapcsolóval elrejted az angol mezőket (ha az esemény
-  csak a magyar oldalra való).
+1. Kattints a jobb fent lévő **Új esemény** gombra — vagy kattints egy napra a
+   naptárban. Jobbról bejön a szerkesztő.
+2. Add meg a **címet**, válassz **kategóriát** (ez a területet jelöli), állítsd be a
+   **kezdő** (és ha kell, a **záró**) dátumot, a helyszínt, esetleg egy linket.
+3. Nyomj **Mentés**-t. Az esemény azonnal megjelenik a naptárban, és a többi
+   szerkesztő is látja.
 
-## Kategóriák (területek)
+Ha az esemény csak a magyar oldalra való, kapcsold be a **„Csak magyar oldal"**-t —
+ekkor az angol mezőket nem kell kitöltened.
 
-A kategóriák a területeket jelölik (pl. Tanulmányi, Rendezvények, HÖK, ISC), külön
-színnel. A fejléc **fogaskerék** gombjával éred el: **Félév és kategóriák**.
+## Esemény módosítása vagy törlése
 
-## Félévek kezelése (fejléc → „Félévek")
+Kattints az eseményre a naptárban vagy az idővonalon — ugyanaz a panel nyílik meg.
+Itt át tudod írni, vagy a **Törlés** gombbal el tudod távolítani.
 
-A státuszt **te vezérled** (nem a dátumokból számolódik – azok csak információ):
+## Naptár és idővonal nézet
 
-- **Aktív**: ezt mutatja a weblap. Mindig pontosan egy aktív van, és addig marad
-  aktív, amíg át nem váltasz.
-- **Tervezett**: előkészítés alatt, a weblap még nem mutatja.
-- **Archivált**: lezárt, korábbi félév (megőrizve).
+Fent válthatsz a **Naptár** (havi rács) és az **Idővonal** (lista) nézet között.
+Telefonon alapból az idővonal nyílik meg, mert az áttekinthetőbb kis kijelzőn.
 
-Új félév létrehozása → **Tervezett**. Amikor kész, kattints **„Aktiválás"** →
-élővé válik, a korábbi aktív automatikusan **archiválttá** válik.
-A **„Betölt"** egy másik félévet nyit meg szerkesztésre. A **„Szerkesztés alatt"**
-felirat azt jelzi, melyik félév van épp megnyitva.
+## Területek (kategóriák)
 
-## Biztonsági mentés
+A kategóriák a területeket jelölik, mindegyiknek saját színe van. A fejléc
+**fogaskerék** gombjával éred el őket, ott tudsz színt, nevet módosítani vagy újat
+felvenni.
 
-A fejléc **letöltés** ikonjával bármikor lementhetsz egy JSON-pillanatképet.
-Érdemes időnként megtenni (a közös fiók miatt egy véletlen törlés végleges).
+## Félévek
 
-## Technikai megjegyzések
+A fejléc **Félévek** gombjával kezeled őket. Egyszerre **egy aktív** félév van.
 
-- Firebase projekt: `timeline-d447b` (Realtime Database + Email/jelszó hitelesítés).
-- A webes Firebase-config (`js/firebase-config.js`) nyilvános azonosítókat tartalmaz,
-  ez rendben van – a védelmet a Realtime Database „rules" + a közös jelszó adja.
-- A weblap (`HOK_weboldal/assets/js/events-calendar.js`) a Firebase REST-en keresztül
-  olvassa az aktív félevet; ha a felhő nem elérhető, visszaesik a statikus
-  `assets/data/events-calendar.json`-ra.
+- **Új félév**: a „Félévek" ablakban, az **Új félév** gombbal. Ilyenkor még
+  *tervezett* (előkészítés alatt), nyugodtan dolgozhatsz rajta.
+- **Aktiválás**: amikor kész, az **Aktiválás** gombbal teszed élővé. A korábbi aktív
+  ilyenkor automatikusan *archivált* lesz.
+- **Betölt**: egy másik félévet nyit meg szerkesztésre.
+
+## Közzététel a weboldalra
+
+A szerkesztőben végzett munka a közös felhőben van, de a **nyilvános weboldal** nem
+frissül magától. Amikor szeretnéd kitenni az aktuális állapotot:
+
+1. A fejléc **Letöltés** gombjával mentsd le a naptár JSON-fájlját.
+2. Töltsd fel / cseréld le vele a weboldalon a megfelelő fájlt (ezt általában egy
+   felelős intézi).
+
+A weboldal ezután a frissített naptárt mutatja. (A letöltött fájl egyben biztonsági
+mentésként is jó — érdemes megőrizni.)
+
+## Jó tudni
+
+Többen is szerkeszthettek egyszerre — mindenki a saját eseményeit viszi, és pár
+másodpercen belül látjátok egymás módosításait.

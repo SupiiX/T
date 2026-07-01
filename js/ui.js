@@ -603,6 +603,26 @@ export class UIManager {
       </div>`;
     }
 
+    // Generikus megerősítő modal (a natív confirm() helyett, egységes UI-val)
+    renderConfirmModal({ title, message, confirmLabel = 'Törlés', confirmIcon = Icons.Trash2 }) {
+        return `
+      <div id="app-confirm-modal" class="wizard-overlay">
+        <div class="wizard-box" style="width:400px">
+          <div class="wizard-header">
+            <h2>${this.escapeHtml(title)}</h2>
+            <button id="app-confirm-x" class="modal-close" aria-label="Bezárás">${Icons.X}</button>
+          </div>
+          <div class="wizard-body">
+            <p style="color:var(--color-gray-600);line-height:1.55">${this.escapeHtml(message)}</p>
+          </div>
+          <div class="wizard-footer" style="justify-content:flex-end;gap:0.5rem">
+            <button id="app-confirm-cancel" class="btn btn-ghost">Mégse</button>
+            <button id="app-confirm-ok" class="btn btn-danger">${confirmIcon}<span>${this.escapeHtml(confirmLabel)}</span></button>
+          </div>
+        </div>
+      </div>`;
+    }
+
     renderNewSemesterWizard() {
         // Magyar tanév: szeptembertől kezdődik (hónap index 8)
         const now = new Date();

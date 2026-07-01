@@ -1,7 +1,7 @@
 // Timeline view rendering – modern, hónapokra bontott kártyás lista
 
 import { Icons } from './icons.js';
-import { formatDateShort } from './utils.js';
+import { formatDateShort, todayStr } from './utils.js';
 
 const MONTHS_HU = ['jan', 'feb', 'márc', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szept', 'okt', 'nov', 'dec'];
 
@@ -48,7 +48,7 @@ export class TimelineView {
     }
 
     findNextId(sortedEvents) {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = todayStr();
         for (const ev of sortedEvents) {
             const end = ev.endDate || ev.date;
             if (end >= today) return ev.id;

@@ -72,11 +72,22 @@ export class EventManager {
         const form = this.state.data.form;
         if (form.id === null) return;
 
-        if (!confirm('Biztosan törölni szeretnéd ezt az eseményt?')) return;
+        const doDelete = () => {
+            this.state.deleteEvent(form.id);
+            this.clearForm();
+            window.showToast('Esemény törölve.', 'success');
+        };
 
-        this.state.deleteEvent(form.id);
-        this.clearForm();
-        window.showToast('Esemény törölve.', 'success');
+        if (this.app && this.app.openConfirm) {
+            this.app.openConfirm({
+                title: 'Esemény törlése',
+                message: `Biztosan törölni szeretnéd a(z) „${form.title}" eseményt?`,
+                confirmLabel: 'Törlés',
+                onConfirm: doDelete
+            });
+        } else if (confirm('Biztosan törölni szeretnéd ezt az eseményt?')) {
+            doDelete();
+        }
     }
 
     clearForm() {
