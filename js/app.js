@@ -36,6 +36,9 @@ function showToast(message, type = 'info', duration = 3500) {
         if (toast.classList.contains('toast-hiding')) return;
         toast.classList.add('toast-hiding');
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        // Biztonsági háló: ha a transitionend valamiért nem fut le
+        // (pl. prefers-reduced-motion), akkor is eltávolítjuk.
+        setTimeout(() => toast.remove(), 400);
     };
     toast.querySelector('.toast-close').addEventListener('click', dismiss);
     container.appendChild(toast);

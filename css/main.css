@@ -688,6 +688,10 @@ svg {
 .toast-close:hover { color: #d4d4d8; }
 
 .toast.toast-hiding {
+    /* Az animation: none kötelező: a toast-in animáció "forwards" kitöltése
+       különben felülírná az elrejtő opacity/transform értékeket, és a toast
+       sosem tűnne el. */
+    animation: none;
     opacity: 0;
     transform: translateY(-10px) scale(0.96);
 }
